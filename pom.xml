@@ -163,23 +163,23 @@
   </profiles>
 
   <repositories>
-    <!-- <repository>
+     <repository>
       <id>spring-milestone</id>
       <url>https://repo.spring.io/libs-release</url>
-    </repository> -->
+    </repository>
 
-    <repository>
+    <!-- <repository>
       <id>nexus</id>
       <url>http://nexus-cicd.rhel-cdk.10.1.2.2.xip.io/content/groups/public/</url>
-    </repository>
+    </repository> -->
 
   </repositories>
 
-  <!-- <pluginRepositories>
+   <pluginRepositories>
     <pluginRepository>
       <id>spring-milestone</id>
       <url>https://repo.spring.io/libs-release</url>
     </pluginRepository>
-  </pluginRepositories> -->
+  </pluginRepositories>
 
 </project>
