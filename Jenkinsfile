@@ -32,7 +32,8 @@ projectProd = 'hello-prod'
 microservice = 'springboot-hello'
 
 // Collect the git info
-gitURL = "http://tfs.ups.com:8080/tfs/UpsProd/P08SGIT_EA_CDP/_git/springboot-hello"
+//gitURL = "http://tfs.ups.com:8080/tfs/UpsProd/P08SGIT_EA_CDP/_git/springboot-hello"
+gitURL = "https://github.com/domenicbove/springboot-sample-app"
 gitContextDir = "/"
 gitBranch = env.BRANCH_NAME
 gitCommit = env.GIT_COMMIT
