@@ -76,6 +76,14 @@ stage ('Build and Unit Test in Develop') {
       print "OCP objects replaced!"
     }
 
+    print "Starting build..."
+    openshiftBuild(namespace: projectDev,
+       buildConfig: microservice,
+       showBuildLogs: 'true',
+       apiURL: devClusterAPIURL,
+       authToken: devClusterAuthToken)
+    print "Build started"
+
   }
 
 }
