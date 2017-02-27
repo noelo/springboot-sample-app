@@ -202,10 +202,11 @@ def promoteOCPObjects(String microservice, String srcProject, String srcAPIURL,
     oc export dc,is,svc,secret,route -l microservice=${microservice}  \
       -n ${srcProject} -o yaml > objects.yaml
 
-      //      -l template=app-template \
-
     cat objects.yaml
   """
+      //      -l template=app-template \
+
+
   // TODO: Check to see if apply changes route host in OpenShift 3.4
   // Attempt to correct the auto generated route
   File objects = new File('objects.yaml')
