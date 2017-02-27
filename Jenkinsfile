@@ -46,7 +46,7 @@ templatePath = "${microservice}/infra/ocp-templates/ups-maven-s2i-routed-templat
 template = "openshift//ups-maven-s2i-routed"
 
 // Check if we are in the main dev gitBranch
-if (gitBranch == 'develop') {
+//if (gitBranch == 'develop') {
   // We are in the dev gitBranch. Time to start the main pipeline.
 
   // Build into the develop OpenShift project
@@ -74,17 +74,17 @@ if (gitBranch == 'develop') {
     promoteToProduction()
   }
 
-} else {
+//} else {
   // We are in a feature gitBranch
-  print "Not the develop gitBranch"
+  //print "Not the develop gitBranch"
 
-  node() {
-    print "The jenkins-agent-base works!"
-    print "results: " + existsInProject(microservice, projectDev)
-    print "Agent work completed."
-  }
+//  node() {
+//    print "The jenkins-agent-base works!"
+//    print "results: " + existsInProject(microservice, projectDev)
+//    print "Agent work completed."
+//  }
 
-}
+//}
 
 /**
  * [ocpObjectsExist description]
