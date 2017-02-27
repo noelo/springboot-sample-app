@@ -69,38 +69,38 @@ properties([
         print "Creating OCP objects for ${microservice} in ${projectDev}"
         createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
         print "Objects created!"
-        } else {
+      } else {
           // Replace the objects
           print "Replacing OCP objects for ${microservice} in ${projectDev}"
           replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
           print "OCP objects replaced!"
-        }
+      }
 
-        print "Starting build..."
-        openshiftBuild(namespace: projectDev,
-          buildConfig: microservice,
-          showBuildLogs: 'true',
-          apiURL: devClusterAPIURL,
-          authToken: devClusterAuthToken)
-        print "Build started"
+      print "Starting build..."
+      openshiftBuild(namespace: projectDev,
+        buildConfig: microservice,
+        showBuildLogs: 'true',
+        apiURL: devClusterAPIURL,
+        authToken: devClusterAuthToken)
+      print "Build started"
 
-        print "Verify Deployment in develop"
-        openshiftVerifyDeployment(
-          depCfg: microservice,
-          namespace: projectDev,
-          replicaCount: '1',
-          verbose: 'false',
-          verifyReplicaCount: 'true',
-          waitTime: '50',
-          waitUnit: 'sec',
-          apiURL: devClusterAPIURL,
-          authToken: devClusterAuthToken)
+      print "Verify Deployment in develop"
+      openshiftVerifyDeployment(
+        depCfg: microservice,
+        namespace: projectDev,
+        replicaCount: '1',
+        verbose: 'false',
+        verifyReplicaCount: 'true',
+        waitTime: '50',
+        waitUnit: 'sec',
+        apiURL: devClusterAPIURL,
+        authToken: devClusterAuthToken)
 
-        print "Deployment to develop verified!"
+      print "Deployment to develop verified!"
 
-          }
+      }
 
-        }
+  }
 
         // oc policy add-role-to-group system:image-puller system:serviceaccounts:hello-integration -n hello-develop
         //stage ('Promote to Integration') {
