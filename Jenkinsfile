@@ -70,10 +70,10 @@ template = "openshift//ups-maven-s2i-routed"
     promoteToStress()
   }
 
-  input 'Promote to Production'
-  stage('Promote to Production') {
-    promoteToProduction()
-  }
+  //input 'Promote to Production'
+  //stage('Promote to Production') {
+    //promoteToProduction()
+  //}
 
 //} else {
   // We are in a feature gitBranch
