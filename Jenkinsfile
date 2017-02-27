@@ -209,9 +209,9 @@ def promoteOCPObjects(String microservice, String srcProject, String srcAPIURL,
 
   // TODO: Check to see if apply changes route host in OpenShift 3.4
   // Attempt to correct the auto generated route
-  File objects = new File('objects.yaml')
-  String corrected = correctRoute(objects.text)
-  objects.text = corrected
+//  File objects = new File('objects.yaml')
+//  String corrected = correctRoute(objects.text)
+//  objects.text = corrected
 
   // Login to the dest project cluster
   login(destAPIURL, destAuthToken)
@@ -390,7 +390,7 @@ def buildAndUnitTestInDev() {
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
-      waitTime: '32',
+      waitTime: '50',
       waitUnit: 'sec',
       apiURL: devClusterAPIURL,
       authToken: devClusterAuthToken)
