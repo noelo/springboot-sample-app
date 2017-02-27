@@ -1,0 +1,107 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "ups-maven-s2i-routed",
+        "creationTimestamp": null,
+        "description": "Builds a java app with openjdk java 8 and deploys the resulting uber-jar",
+        "tags": "java,java8,maven,fat-jar,uber-jar,s2i,openjdk",
+        "iconClass": "icon-shadowman"
+    },
+    "objects": [
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${MICROSERVICE_NAME}",
+                "creationTimestamp": null,
+                "labels": {
+                    "microservice": "${MICROSERVICE_NAME}"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftWebConsole"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "60f0b33094c8e5ee"
+                        }
+                    },
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "1802aa5420b11b2c"
+                        }
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    }
+                ],
+                "runPolicy": "Serial",
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "${GIT_REPO_URL}",
+                        "ref": "${GIT_REPO_BRANCH}",
+                        "contextDir": "${GIT_CONTEXT_DIR}"
+                    }
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "s2i-java:latest"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${MICROSERVICE_NAME}:latest"
+                    }
+                },
+                "resources": {},
+                "postCommit": {
+                  "script": "cd /tmp/src && mvn -Dmaven.repo.local=/tmp/artifacts/m2 test"
+                }
+            },
+            "status": {
+                "lastVersion": 0
+            }
+        }  
+    ],
+    "parameters": [
+        {
+          "name": "MICROSERVICE_NAME",
+          "description": "Microservice Name",
+          "value": "java-microservice"
+        },
+        {
+            "name": "HOSTNAME_HTTP",
+            "description": "Custom hostname for https service route.  Leave blank for default hostname, e.g.: \u003capplication-name\u003e-\u003cproject\u003e.\u003cdefault-domain-suffix\u003e"
+        },
+        {
+            "name": "GIT_REPO_URL",
+            "description": "Repository URL"
+        },
+        {
+            "name": "GIT_REPO_BRANCH",
+            "description": "Repository Branch",
+            "value": "develop"
+        },
+        {
+            "name": "GIT_CONTEXT_DIR",
+            "description": "Context Directory",
+            "value": "/"
+        }
+
+    ],
+    "labels": {
+        "template": "ups-maven-s2i-routed"
+    }
+}
