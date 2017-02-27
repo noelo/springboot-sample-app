@@ -14,7 +14,7 @@ stressWWClusterAuthToken = devClusterAuthToken
 prodRRClusterAuthToken = devClusterAuthToken
 prodWWClusterAuthToken = devClusterAuthToken
 
-devClusterAPIURL = 'https://10.1.2.2:8443
+devClusterAPIURL = 'https://10.1.2.2:8443'
 stressRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
 stressWWCluster = 'https://master-vip1.paasdev.ams1907.com:8443'
 prodRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
