@@ -368,7 +368,7 @@ def buildAndUnitTestInDev() {
     } else {
       // Replace the objects
       print "Replacing OCP objects for ${microservice} in ${projectDev}"
-      replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
+    //  replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
       print "OCP objects replaced!"
     }
 
