@@ -22,11 +22,11 @@ prodWWClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
 
 
 // Declare OpenShift project names
-projectDev = 'hello-develop'
-projectInt = 'hello-integration'
-projectUAT = 'hello-uat'
-projectStress = 'hello-stress'
-projectProd = 'hello-prod'
+projectDev = 'sample-develop'
+projectInt = 'sample-integration'
+projectUAT = 'sample-uat'
+projectStress = 'sample-stress'
+projectProd = 'sample-prod'
 
 // Declare microservice name
 microservice = 'springboot-hello'
