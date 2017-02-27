@@ -200,8 +200,9 @@ def promoteOCPObjects(String microservice, String srcProject, String srcAPIURL,
   sh """
     # Export contents of project for a microservice into a yaml file
     oc export dc,is,svc,secret,route -l microservice=${microservice}  \
-      -l template=app-template \
       -n ${srcProject} -o yaml > objects.yaml
+
+      //      -l template=app-template \
 
     cat objects.yaml
   """
