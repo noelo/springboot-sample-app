@@ -8,6 +8,7 @@ properties([
 ])
 
 devClusterAuthToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJzYW1wbGUtZGV2ZWxvcCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJjaWNkLXRva2VuLXhveHhwIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImNpY2QiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJiODBlNzJlNS1mZDFlLTExZTYtYjhkMC01MjU0MDBlZTljOGYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6c2FtcGxlLWRldmVsb3A6Y2ljZCJ9.QKnkxkvGbhxt81lxKRmcMmTwifJ5Eb6IucBQotiuUM_xgoaB4InW6jzqZXHmqaajskELvNL7LumF_c3WR1pEFoDzCL3LZ9C2M-1cGwD-pcTVVk1fXY-K4ruSjFdXubO9zmR716eC80Zusrw7ShSjBizI7x2OsXDUSBjAAuBkMrRs1D2aE-QaJgolLyusfCp2-i1mKLKbPeO7TxF8iAEiHAjyVwQnv5Y98CwdDIjYSCMOMckvyR2FbL9bBZQSsCbfUoWN6Fy-seYMi7OxJwyRg07LVjGnaViorL5u8uKDSJsOTu4pMw_bVDuW9HrSe626ugp04yc55S1Ui11IsE4Qmw'
+
 stressRRClusterAuthToken = devClusterAuthToken
 stressWWClusterAuthToken = devClusterAuthToken
 prodRRClusterAuthToken = devClusterAuthToken
@@ -77,7 +78,7 @@ if (gitBranch == 'develop') {
   // We are in a feature gitBranch
   print "Not the develop gitBranch"
 
-  node('jenkins-agent-base') {
+  node() {
     print "The jenkins-agent-base works!"
     print "results: " + existsInProject(microservice, projectDev)
     print "Agent work completed."
@@ -311,21 +312,29 @@ def login(String apiURL, String authToken) {
  * @param  String targetDir     [description]
  * @return        [description]
  */
-def gitCheckout(String url, String branch, String targetDir, String credentialsId) {
-  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${credentialsId}",
-    passwordVariable: 'pass', usernameVariable: 'user']]) {
-    // Checkout the code and navigate to the target directory
-    int slashIdx = url.indexOf("://")
-    String urlWithCreds = url.substring(0, slashIdx + 3) +
-      "\"${user}:${pass}\"@" + url.substring(slashIdx + 3);
-    sh """
-      # Ensure the targetDir is deleted before we clone
-      rm -rf ${targetDir}
-      git clone -b ${branch} ${urlWithCreds} ${targetDir}
-      echo `pwd && ls -l`
-    """
-  }
-}
+ def gitCheckout(String url, String branch, String targetDir, String credentialsId) {
+
+ sh """
+   # Ensure the targetDir is deleted before we clone
+   rm -rf ${targetDir}
+   git clone -b ${branch} ${url} ${targetDir}
+   echo `pwd && ls -l`
+ """
+
+   //withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${credentialsId}",
+   //  passwordVariable: 'pass', usernameVariable: 'user']]) {
+     // Checkout the code and navigate to the target directory
+   //  int slashIdx = url.indexOf("://")
+   //  String urlWithCreds = url.substring(0, slashIdx + 3) +
+   //    "\"${user}:${pass}\"@" + url.substring(slashIdx + 3);
+   //  sh """
+   //    # Ensure the targetDir is deleted before we clone
+   //    rm -rf ${targetDir}
+   //    git clone -b ${branch} ${urlWithCreds} ${targetDir}
+   //    echo `pwd && ls -l`
+   //  """
+   //}
+ }
 
 
 /**
@@ -337,7 +346,7 @@ def buildAndUnitTestInDev() {
   print "                   Build and Unit Test in Develop                     "
   print "----------------------------------------------------------------------"
   // Fire up a jenkins agent to execute in
-  node('jenkins-agent-base') {
+  node() {
     sh """
       oc version
     """
@@ -395,7 +404,7 @@ def promoteToInt() {
   print "                      Promoting to Integration                        "
   print "----------------------------------------------------------------------"
   // Fire up a jenkins agent to execute in
-  node('jenkins-agent-base') {
+  node() {
 
     // Checkout the code
     //gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
@@ -447,7 +456,7 @@ def promoteToUAT() {
   print "                         Promoting to UAT                             "
   print "----------------------------------------------------------------------"
   // Fire up a jenkins agent to execute in
-  node('jenkins-agent-base') {
+  node() {
     // Checkout the code
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
@@ -501,7 +510,7 @@ def promoteToStress() {
   print "                        Promoting to Stress                           "
   print "----------------------------------------------------------------------"
   // Fire up a jenkins agent to execute in
-  node('jenkins-agent-base') {
+  node() {
     // Checkout the code
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
@@ -555,7 +564,7 @@ def promoteToProd() {
   print "                         Promoting to Prod                            "
   print "----------------------------------------------------------------------"
   // Fire up a jenkins agent to execute in
-  node('jenkins-agent-base') {
+  node() {
     // Checkout the code
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
