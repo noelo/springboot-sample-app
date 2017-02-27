@@ -373,12 +373,12 @@ def buildAndUnitTestInDev() {
     }
 
     print "Starting build..."
-    openshiftBuild(namespace: projectDev,
-      buildConfig: microservice,
-      showBuildLogs: 'true',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Build completed!"
+  //  openshiftBuild(namespace: projectDev,
+  //    buildConfig: microservice,
+  //    showBuildLogs: 'true',
+  //    apiURL: devClusterAPIURL,
+  //    authToken: devClusterAuthToken)
+    print "Build skipped!"
 
 
     print "Verify Deployment in develop"
