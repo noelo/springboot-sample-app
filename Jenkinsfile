@@ -78,7 +78,6 @@ stage ('Build and Unit Test in Develop') {
 
   }
 
-  buildAndUnitTestInDev()
 }
 
 // oc policy add-role-to-group system:image-puller system:serviceaccounts:hello-integration -n hello-develop
@@ -196,8 +195,13 @@ sh """
   MICROSERVICE_NAME=${microservice} \
   GIT_REPO_URL=${gitURL} \
   GIT_REPO_BRANCH=${gitBranch} \
-  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc replace -n ${project} \
-  --force  --cascade -f -
+  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -n ${project}
+
+ oc process -f ${buildConfigTemplatePath} \
+    MICROSERVICE_NAME=${microservice} \
+    GIT_REPO_URL=${gitURL} \
+    GIT_REPO_BRANCH=${gitBranch} \
+    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -n ${project}
 """
 
 // if (!keepBuildConfig) {
