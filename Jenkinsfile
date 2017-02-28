@@ -138,13 +138,13 @@ stage ('Promote to Integration') {
     // Check if the OPC Objects exist in project
     if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
 
-      String strategy = "create"
+      strategy = "create"
       // Create the objects
       // print "Creating OCP objects for ${microservice} in ${projectDev}"
       // createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
       // print "Objects created!"
     } else {
-      String strategy = "apply"
+      strategy = "apply"
       // Replace the objects
       // print "Replacing OCP objects for ${microservice} in ${projectDev}"
       // replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
