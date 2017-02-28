@@ -100,7 +100,7 @@ stage ('Build and Unit Test in Develop') {
 
 stage ('Promote to Integration') {
 
-  promoteImageBetweenProjectsSameCluster(String projectDev, String projectInt, String devClusterAPIURL, String devClusterAuthToken)
+  promoteImageBetweenProjectsSameCluster(projectDev, projectInt, devClusterAPIURL, devClusterAuthToken)
 
   // print "----------------------------------------------------------------------"
   // print "                      Promoting to Integration                        "
