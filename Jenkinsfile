@@ -99,52 +99,15 @@ stage ('Build and Unit Test in Develop') {
 }
 
 stage ('Promote to Integration') {
-
   promoteImageBetweenProjectsSameCluster(projectDev, projectInt, devClusterAPIURL, devClusterAuthToken)
+}
 
-  // print "----------------------------------------------------------------------"
-  // print "                      Promoting to Integration                        "
-  // print "----------------------------------------------------------------------"
-  //
-  // node() {
-  //   gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-  //
-  //   // login to the project's cluster
-  //   login(devClusterAPIURL, devClusterAuthToken)
-  //
-  //   // Check if the OPC Objects exist in project
-  //   if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
-  //     strategy = "create"
-  //   } else {
-  //     strategy = "apply"
-  //   }
-  //
-  //   createOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken, strategy)
-  //
-  //   // Tag microservice image into the integration OpenShift project
-  //   openshiftTag(namespace: projectDev,
-  //     sourceStream: microservice,
-  //     sourceTag: 'latest',
-  //     destinationNamespace: projectInt,
-  //     destinationStream: microservice,
-  //     destinationTag: 'latest',
-  //     apiURL: devClusterAPIURL,
-  //     authToken: devClusterAuthToken)
-  //
-  //   print "Verify Deployment in develop"
-  //   openshiftVerifyDeployment(
-  //     depCfg: microservice,
-  //     namespace: projectInt,
-  //     replicaCount: '1',
-  //     verbose: 'false',
-  //     verifyReplicaCount: 'true',
-  //     waitTime: '50',
-  //     waitUnit: 'sec',
-  //     apiURL: devClusterAPIURL,
-  //     authToken: devClusterAuthToken)
-  //   print "Deployment to develop verified!"
-  // }
+stage ('Promote to UAT') {
+  promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
+}
 
+stage ('Promote to UAT') {
+  promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
 }
 
 def promoteImageBetweenProjectsSameCluster(String startProject, String endProject, String clusterAPIURL, String clusterAuthToken) {
@@ -184,7 +147,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
-      waitTime: '50',
+      waitTime: '40',
       waitUnit: 'sec',
       apiURL: clusterAPIURL,
       authToken: clusterAuthToken)
