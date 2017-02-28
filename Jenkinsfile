@@ -99,83 +99,97 @@ stage ('Build and Unit Test in Develop') {
 }
 
 stage ('Promote to Integration') {
+
+  promoteImageBetweenProjectsSameCluster(String projectDev, String projectInt, String devClusterAPIURL, String devClusterAuthToken)
+
+  // print "----------------------------------------------------------------------"
+  // print "                      Promoting to Integration                        "
+  // print "----------------------------------------------------------------------"
+  //
+  // node() {
+  //   gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
+  //
+  //   // login to the project's cluster
+  //   login(devClusterAPIURL, devClusterAuthToken)
+  //
+  //   // Check if the OPC Objects exist in project
+  //   if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
+  //     strategy = "create"
+  //   } else {
+  //     strategy = "apply"
+  //   }
+  //
+  //   createOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken, strategy)
+  //
+  //   // Tag microservice image into the integration OpenShift project
+  //   openshiftTag(namespace: projectDev,
+  //     sourceStream: microservice,
+  //     sourceTag: 'latest',
+  //     destinationNamespace: projectInt,
+  //     destinationStream: microservice,
+  //     destinationTag: 'latest',
+  //     apiURL: devClusterAPIURL,
+  //     authToken: devClusterAuthToken)
+  //
+  //   print "Verify Deployment in develop"
+  //   openshiftVerifyDeployment(
+  //     depCfg: microservice,
+  //     namespace: projectInt,
+  //     replicaCount: '1',
+  //     verbose: 'false',
+  //     verifyReplicaCount: 'true',
+  //     waitTime: '50',
+  //     waitUnit: 'sec',
+  //     apiURL: devClusterAPIURL,
+  //     authToken: devClusterAuthToken)
+  //   print "Deployment to develop verified!"
+  // }
+
+}
+
+def promoteImageBetweenProjectsSameCluster(String startProject, String endProject, String clusterAPIURL, String clusterAuthToken) {
   print "----------------------------------------------------------------------"
-  print "                      Promoting to Integration                        "
+  print "                     Promoting to ${endProject}                       "
   print "----------------------------------------------------------------------"
 
   node() {
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
     // login to the project's cluster
-    login(devClusterAPIURL, devClusterAuthToken)
+    login(clusterAPIURL, clusterAuthToken)
 
     // Check if the OPC Objects exist in project
-    if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
+    if (!ocpObjectsExist(microservice, endProject, clusterAPIURL, clusterAuthToken)) {
       strategy = "create"
     } else {
       strategy = "apply"
     }
 
-    createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken, strategy)
+    createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken, strategy)
 
-    // Tag microservice image into the integration OpenShift project
-    openshiftTag(namespace: projectDev,
+    print "Tagging ${microservice} image into ${endProject}"
+    openshiftTag(namespace: startProject,
       sourceStream: microservice,
       sourceTag: 'latest',
-      destinationNamespace: projectInt,
+      destinationNamespace: endProject,
       destinationStream: microservice,
       destinationTag: 'latest',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
+      apiURL: clusterAPIURL,
+      authToken: clusterAuthToken)
 
-    print "Verify Deployment in develop"
+    print "Verify Deployment in ${endProject}"
     openshiftVerifyDeployment(
       depCfg: microservice,
-      namespace: projectDev,
+      namespace: endProject,
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
       waitTime: '50',
       waitUnit: 'sec',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
+      apiURL: clusterAPIURL,
+      authToken: clusterAuthToken)
     print "Deployment to develop verified!"
-
-  }
-
 }
-
-        // oc policy add-role-to-group system:image-puller system:serviceaccounts:hello-integration -n hello-develop
-        //stage ('Promote to Integration') {
-        //  promoteToInt()
-        //}
-
-        //input 'Promote to UAT?'
-        //stage ("Promote to UAT") {
-        //  promoteToUAT()
-        //}
-
-        //input 'Promote to Stress?'
-        //stage('Promote to Stress') {
-        //  promoteToStress()
-        //}
-
-        //input 'Promote to Production'
-        //stage('Promote to Production') {
-        //promoteToProduction()
-        //}
-
-        //} else {
-        // We are in a feature gitBranch
-        //print "Not the develop gitBranch"
-
-        //  node() {
-        //    print "The jenkins-agent-base works!"
-        //    print "results: " + existsInProject(microservice, projectDev)
-        //    print "Agent work completed."
-        //  }
-
-        //}
 
 /**
 * [ocpObjectsExist description]
@@ -287,318 +301,3 @@ def gitCheckout(String url, String branch, String targetDir, String credentialsI
   //  """
   //}
 }
-
-
-/**
-* [buildAndUnitTestInDev description]
-* @return [description]
-*/
-def buildAndUnitTestInDev() {
-  print "----------------------------------------------------------------------"
-  print "                   Build and Unit Test in Develop                     "
-  print "----------------------------------------------------------------------"
-  // Fire up a jenkins agent to execute in
-  node() {
-    sh """
-    oc version
-    """
-    input 'Version good?'
-    // Checkout the code
-    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
-    // Check if the OPC Objects exist in project
-    if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL,
-      devClusterAuthToken)) {
-        // Create the objects
-        print "Creating OCP objects for ${microservice} in ${projectDev}"
-        createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-        print "Objects created!"
-        } else {
-          // Replace the objects
-          print "Replacing OCP objects for ${microservice} in ${projectDev}"
-          //  replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-          print "OCP objects replaced!"
-        }
-
-        print "Starting build..."
-        //  openshiftBuild(namespace: projectDev,
-        //    buildConfig: microservice,
-        //    showBuildLogs: 'true',
-        //    apiURL: devClusterAPIURL,
-        //    authToken: devClusterAuthToken)
-        print "Build skipped!"
-
-
-        print "Verify Deployment in develop"
-
-        // Verify the Deployment into dev
-        openshiftVerifyDeployment(
-          depCfg: microservice,
-          namespace: projectDev,
-          replicaCount: '1',
-          verbose: 'false',
-          verifyReplicaCount: 'true',
-          waitTime: '50',
-          waitUnit: 'sec',
-          apiURL: devClusterAPIURL,
-          authToken: devClusterAuthToken)
-
-          print "Deployment to develop verified!"
-        }
-      }
-
-      /**
-      * [promoteToInt description]
-      * @return [description]
-      */
-      def promoteToInt() {
-        print "----------------------------------------------------------------------"
-        print "                      Promoting to Integration                        "
-        print "----------------------------------------------------------------------"
-        // Fire up a jenkins agent to execute in
-        node() {
-
-          // Checkout the code
-          //gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
-          print "Promoting to integration..."
-          // Copy objects from develop -> integration
-          print "Promoting OCP objects for ${microservice} in ${projectInt}"
-          promoteOCPObjects(microservice, projectDev, devClusterAPIURL,
-            devClusterAuthToken, projectInt, devClusterAPIURL, devClusterAuthToken)
-            print "Objects promoted!"
-
-
-            // Tag microservice image into the integration OpenShift project
-            openshiftTag(namespace: projectDev,
-              sourceStream: microservice,
-              sourceTag: 'latest',
-              destinationNamespace: projectInt,
-              destinationStream: microservice,
-              destinationTag: 'latest',
-              apiURL: devClusterAPIURL,
-              authToken: devClusterAuthToken)
-
-              print "Promotion completed!"
-
-              print "Verify Deployment in integration"
-
-              // Verify the Deployment into integration
-              openshiftVerifyDeployment(
-                depCfg: microservice,
-                namespace: projectInt,
-                replicaCount: '1',
-                verbose: 'false',
-                verifyReplicaCount: 'true',
-                waitTime: '32',
-                waitUnit: 'sec',
-                apiURL: devClusterAPIURL,
-                authToken: devClusterAuthToken)
-
-                print "Deployment to integration verified!"
-              }
-            }
-
-/**
-* [promoteToUAT description]
-* @return [description]
-*/
-def promoteToUAT() {
-  print "----------------------------------------------------------------------"
-  print "                         Promoting to UAT                             "
-  print "----------------------------------------------------------------------"
-  // Fire up a jenkins agent to execute in
-  node() {
-    // Checkout the code
-    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
-    // Fire up jenkins-agent pod for promotion to UAT
-    print "Promotion to UAT commencing..."
-
-    // Copy objects from integration -> UAT
-    print "Promoting OCP objects for ${microservice} in ${projectUAT}"
-    promoteOCPObjects(microservice, projectInt, devClusterAPIURL,
-      devClusterAuthToken, projectUAT, devClusterAPIURL, devClusterAuthToken)
-      print "Objects promoted!"
-
-      // Tag microservice image into the UAT OpenShift project
-      openshiftTag(namespace: projectInt,
-        sourceStream: microservice,
-        sourceTag: 'latest',
-        destinationNamespace: projectUAT,
-        destinationStream: microservice,
-        destinationTag: 'latest',
-        apiURL: devClusterAPIURL,
-        authToken: devClusterAuthToken)
-
-        print "Promotion completed!"
-
-        print "Verify Deployment in UAT"
-
-        // Verify the Deployment into UAT
-
-        openshiftVerifyDeployment(
-          depCfg: microservice,
-          namespace: projectUAT,
-          replicaCount: '1',
-          verbose: 'false',
-          verifyReplicaCount: 'true',
-          waitTime: '32',
-          waitUnit: 'sec',
-          apiURL: devClusterAPIURL,
-          authToken: devClusterAuthToken)
-
-          print "Deployment to UAT verified!"
-
-        }
-      }
-
-      /**
-      * [promoteToStress description]
-      * @return [description]
-      */
-      def promoteToStress() {
-        print "----------------------------------------------------------------------"
-        print "                        Promoting to Stress                           "
-        print "----------------------------------------------------------------------"
-        // Fire up a jenkins agent to execute in
-        node() {
-          // Checkout the code
-          gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
-          print "Promotion to Stress commencing..."
-          // TODO: Handle both RR and WW clusters
-          // Copy objects from UAT -> stress
-          print "Promoting OCP objects for ${microservice} in ${projectStress}"
-          // copyOCPObjects(microservice, projectUAT, devClusterAPIURL,
-          //   devClusterAuthToken, projectStress, stressRRClusterAPIURL, stressRRClusterAuthToken)
-          promoteOCPObjects(microservice, projectUAT, devClusterAPIURL,
-            devClusterAuthToken, projectStress, devClusterAPIURL, devClusterAuthToken)
-            print "Objects promoted!"
-
-            // TODO: Switch from tagging to importing inter cluster
-            // Tag microservice image into the Stress OpenShift project
-            openshiftTag(namespace: projectUAT,
-              sourceStream: microservice,
-              sourceTag: 'latest',
-              destinationNamespace: projectStress,
-              destinationStream: microservice,
-              destinationTag: 'latest',
-              apiURL:devClusterAPIURL,
-              authToken: devClusterAuthToken)
-
-              print "Promotion completed!"
-
-              print "Verify Deployment in Stress"
-
-              // Verify the Deployment into Stress
-              openshiftVerifyDeployment(
-                depCfg: microservice,
-                namespace: projectStress,
-                replicaCount: '1',
-                verbose: 'false',
-                verifyReplicaCount: 'true',
-                waitTime: '32',
-                waitUnit: 'sec',
-                apiURL: devClusterAPIURL,
-                authToken: devClusterAuthToken)
-
-                print "Deployment to Stress verified!"
-              }
-            }
-
-            /**
-            * [promoteToProd description]
-            * @return [description]
-            */
-            def promoteToProd() {
-              print "----------------------------------------------------------------------"
-              print "                         Promoting to Prod                            "
-              print "----------------------------------------------------------------------"
-              // Fire up a jenkins agent to execute in
-              node() {
-                // Checkout the code
-                gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
-                print "Promotion to Production commencing..."
-                // TODO: Handle both RR and WW clusters
-                // Copy objects from stress -> prod
-                print "Promoting OCP objects for ${microservice} in ${projectStress}"
-                //  copyOCPObjects(microservice, projectStress, stressRRClusterAPIURL,
-                //    stressRRClusterAuthToken, projectProd, prodRRClusterAPIURL, prodRRClusterAuthToken)
-                promoteOCPObjects(microservice, projectStress, stressRRClusterAPIURL,
-                  stressRRClusterAuthToken, projectProd, devClusterAPIURL, devClusterAuthToken)
-                  print "Objects promoted!"
-
-                  // TODO: Switch from tagging to import inter cluster
-                  // Tag microservice image into the Stress OpenShift project
-                  openshiftTag(namespace: projectStress,
-                    sourceStream: microservice,
-                    sourceTag: 'latest',
-                    destinationNamespace: projectProd,
-                    destinationStream: microservice,
-                    destinationTag: 'latest',
-                    apiURL: devClusterAPIURL,
-                    authToken: devClusterAuthToken)
-
-
-                    print "Promotion completed!"
-
-                    print "Verify Deployment in Production"
-
-                    // Verify the Deployment into Production
-                    openshiftVerifyDeployment(
-                      depCfg: microservice,
-                      namespace: projectProd,
-                      replicaCount: '1',
-                      verbose: 'false',
-                      verifyReplicaCount: 'true',
-                      waitTime: '32',
-                      waitUnit: 'sec',
-                      apiURL: devClusterAPIURL,
-                      authToken: devClusterAuthToken)
-
-                      print "Deployment to Production verified!"
-                    }
-                  }
-
-                  // stage 'Promote to Integration'
-                  // openshiftTag(namespace: 'development', sourceStream: 'myapp',  sourceTag: 'latest', destinationStream: 'myapp', destinationTag: 'latest')
-                  //
-                  // stage 'Integration Test'
-                  // openshiftBuild(namespace: 'integration', buildConfig: 'myappIntegrationTest', showBuildLogs: 'true')
-                  //
-                  // stage 'Promote to QA Dev Gate'
-                  // input message: "Promote to QA Dev?", ok: "Promote"
-                  //
-                  // stage 'Promote to QA Dev'
-                  // openshiftTag(namespace: 'integration', sourceStream: 'myapp',  sourceTag: 'latest', destinationStream: 'myapp', destinationTag: 'latest')
-                  //
-                  // stage 'Run Integration Tests Gate'
-                  // input message: "Run Integration Tests?", ok: "Promote"
-                  //
-                  // stage 'Final Integration Test'
-                  // openshiftBuild(namespace: 'qaDev', buildConfig: 'myappIntegrationTest', showBuildLogs: 'true')
-                  //
-                  // stage 'Promote to UAT Gate'
-                  // input message: "Promote to UAT?", ok: "Promote"
-                  //
-                  // stage 'Promote to QA Dev'
-                  // openshiftTag(namespace: 'qaDev', sourceStream: 'myapp',  sourceTag: 'latest', destinationStream: 'myapp', destinationTag: 'latest')
-                  //
-                  // stage 'UAT Approve Gate'
-                  // input message: "Promote to Stress?", ok: "Promote"
-                  //
-                  // stage 'Promote to Stress'
-                  // openshiftTag(namespace: 'uat', sourceStream: 'myapp',  sourceTag: 'latest', destinationStream: 'myapp', destinationTag: 'latest')
-                  //
-                  // stage 'Change Control Approve Gate'
-                  // input message: "Promote to Production?", ok: "Promote"
-                  //
-                  // stage 'Promote to Production'
-                  // openshiftTag(namespace: 'stress', sourceStream: 'myapp',  sourceTag: 'latest', destinationStream: 'myapp', destinationTag: 'latest')
-
-
-                  // https://blog.openshift.com/create-build-pipelines-openshift-3-3/
-                  // need all these namespaces, build configs, deployment configs in openshift
-                  // oc policy add-role-to-group system:image-puller system:serviceaccounts:testing -n development
