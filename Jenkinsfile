@@ -67,16 +67,22 @@ stage ('Build and Unit Test in Develop') {
 
     // Check if the OPC Objects exist in project
     if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
+
+      String strategy = "create"
       // Create the objects
-      print "Creating OCP objects for ${microservice} in ${projectDev}"
-      createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-      print "Objects created!"
+      // print "Creating OCP objects for ${microservice} in ${projectDev}"
+      // createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
+      // print "Objects created!"
     } else {
+      String strategy = "apply"
       // Replace the objects
-      print "Replacing OCP objects for ${microservice} in ${projectDev}"
-      replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-      print "OCP objects replaced!"
+      // print "Replacing OCP objects for ${microservice} in ${projectDev}"
+      // replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
+      // print "OCP objects replaced!"
     }
+
+    createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken, strategy)
+    print "Objects created!"
 
     print "Starting build..."
     openshiftBuild(namespace: projectDev,
@@ -116,18 +122,37 @@ stage ('Promote to Integration') {
     login(devClusterAPIURL, devClusterAuthToken)
     print "Logged in."
 
+    // // Check if the OPC Objects exist in project
+    // if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
+    //   // Create the objects
+    //   print "Creating OCP objects for ${microservice} in ${projectInt}"
+    //   createOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
+    //   print "Objects created!"
+    // } else {
+    //   // Replace the objects
+    //   print "Replacing OCP objects for ${microservice} in ${projectDev}"
+    //   replaceOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
+    //   print "OCP objects replaced!"
+    // }
+
     // Check if the OPC Objects exist in project
     if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
+
+      String strategy = "create"
       // Create the objects
-      print "Creating OCP objects for ${microservice} in ${projectInt}"
-      createOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
-      print "Objects created!"
+      // print "Creating OCP objects for ${microservice} in ${projectDev}"
+      // createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
+      // print "Objects created!"
     } else {
+      String strategy = "apply"
       // Replace the objects
-      print "Replacing OCP objects for ${microservice} in ${projectDev}"
-      replaceOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
-      print "OCP objects replaced!"
+      // print "Replacing OCP objects for ${microservice} in ${projectDev}"
+      // replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
+      // print "OCP objects replaced!"
     }
+
+    createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken, strategy)
+    print "Objects created!"
 
     // Tag microservice image into the integration OpenShift project
     openshiftTag(namespace: projectDev,
@@ -220,11 +245,13 @@ def boolean ocpObjectsExist(String microservice, String project, String apiURL,
 * @param  boolean buildConfig   [description]
 * @return         [description]
 */
-def createOCPObjects(String microservice, String project, String apiURL, String authToken) {
+def createOCPObjects(String microservice, String project, String apiURL, String authToken, String createStrategy) {
   // print "Logging in..."
   // // login to the project's cluster
   // login(apiURL, authToken)
   // print "Logged in."
+
+  print "Creating OCP objects for ${microservice} in ${project} using strategy ${sourceStrategy}"
 
   // Process the microservice's template and create the objects
   sh """
@@ -233,7 +260,7 @@ def createOCPObjects(String microservice, String project, String apiURL, String 
   MICROSERVICE_NAME=${microservice} \
   GIT_REPO_URL=${gitURL} \
   GIT_REPO_BRANCH=${gitBranch} \
-  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc create -f - \
+  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc ${createStrategy} -f - \
   -n ${project}
   """
 
@@ -244,50 +271,50 @@ def createOCPObjects(String microservice, String project, String apiURL, String 
     MICROSERVICE_NAME=${microservice} \
     GIT_REPO_URL=${gitURL} \
     GIT_REPO_BRANCH=${gitBranch} \
-    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc create -f - \
+    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc ${createStrategy} -f - \
     -n ${project}
     """
   }
 
 }
 
-/**
-* [replaceOCPObjects description]
-* @param  String project       [description]
-* @param  String apiURL        [description]
-* @param  String authToken     [description]
-* @return        [description]
-*/
-def replaceOCPObjects(String microservice, String project, String apiURL, String authToken) {
-  // print "Logging in..."
-  // // login to the project's cluster
-  // login(apiURL, authToken)
-  // print "Logged in."
-
-  // Process the microservice's template
-  sh """
-  # Delete old builds
-  #oc delete builds -l microservice=${microservice} -n ${project}
-  #oc delete dc/${microservice} -n ${project}
-  # Process the template
-  oc process -f ${templatePath} \
-  MICROSERVICE_NAME=${microservice} \
-  GIT_REPO_URL=${gitURL} \
-  GIT_REPO_BRANCH=${gitBranch} \
-  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
-  """
-  // If in Develop Project create the BuildConfig as well
-  if (project.equals(projectDev)) {
-    sh """
-    oc process -f ${buildConfigTemplatePath} \
-    MICROSERVICE_NAME=${microservice} \
-    GIT_REPO_URL=${gitURL} \
-    GIT_REPO_BRANCH=${gitBranch} \
-    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
-    """
-  }
-
-}
+// /**
+// * [replaceOCPObjects description]
+// * @param  String project       [description]
+// * @param  String apiURL        [description]
+// * @param  String authToken     [description]
+// * @return        [description]
+// */
+// def replaceOCPObjects(String microservice, String project, String apiURL, String authToken) {
+//   // print "Logging in..."
+//   // // login to the project's cluster
+//   // login(apiURL, authToken)
+//   // print "Logged in."
+//
+//   // Process the microservice's template
+//   sh """
+//   # Delete old builds
+//   #oc delete builds -l microservice=${microservice} -n ${project}
+//   #oc delete dc/${microservice} -n ${project}
+//   # Process the template
+//   oc process -f ${templatePath} \
+//   MICROSERVICE_NAME=${microservice} \
+//   GIT_REPO_URL=${gitURL} \
+//   GIT_REPO_BRANCH=${gitBranch} \
+//   GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
+//   """
+//   // If in Develop Project create the BuildConfig as well
+//   if (project.equals(projectDev)) {
+//     sh """
+//     oc process -f ${buildConfigTemplatePath} \
+//     MICROSERVICE_NAME=${microservice} \
+//     GIT_REPO_URL=${gitURL} \
+//     GIT_REPO_BRANCH=${gitBranch} \
+//     GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
+//     """
+//   }
+//
+// }
 
                 /**
                 * [promoteOCPObjects description]
