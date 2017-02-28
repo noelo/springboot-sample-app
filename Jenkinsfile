@@ -78,13 +78,13 @@ stage ('Build and Unit Test in Develop') {
       print "OCP objects replaced!"
     }
 
-    print "Starting build..."
-    openshiftBuild(namespace: projectDev,
-      buildConfig: microservice,
-      showBuildLogs: 'true',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Build started"
+    // print "Starting build..."
+    // openshiftBuild(namespace: projectDev,
+    //   buildConfig: microservice,
+    //   showBuildLogs: 'true',
+    //   apiURL: devClusterAPIURL,
+    //   authToken: devClusterAuthToken)
+    // print "Build started"
 
     print "Verify Deployment in develop"
     openshiftVerifyDeployment(
@@ -113,7 +113,7 @@ stage ('Promote to Integration') {
 
     print "Logging in..."
     // login to the project's cluster
-    login(apiURL, authToken)
+    login(devClusterAPIURL, devClusterAuthToken)
     print "Logged in."
 
     // Check if the OPC Objects exist in project
