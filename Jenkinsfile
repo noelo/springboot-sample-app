@@ -143,7 +143,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
       waitUnit: 'sec',
       apiURL: clusterAPIURL,
       authToken: clusterAuthToken)
-    print "Deployment to develop verified!"
+    print "Deployment to ${endProject} verified!"
 
   }
 }
