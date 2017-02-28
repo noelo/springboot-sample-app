@@ -63,15 +63,7 @@ stage ('Build and Unit Test in Develop') {
     // login to the project's cluster
     login(devClusterAPIURL, devClusterAuthToken)
 
-    // Check if the OPC Objects exist in project
-    if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
-      //strategy = "create"
-      strategy = "apply"
-    } else {
-      strategy = "apply"
-    }
-
-    createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken, strategy)
+    createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
 
 
     print "Starting build..."
@@ -124,15 +116,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
     // login to the project's cluster
     login(clusterAPIURL, clusterAuthToken)
 
-    // Check if the OPC Objects exist in project
-    if (!ocpObjectsExist(microservice, endProject, clusterAPIURL, clusterAuthToken)) {
-      //strategy = "create"
-      strategy = "apply"
-    } else {
-      strategy = "apply"
-    }
-
-    createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken, strategy)
+    createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken)
 
     print "Tagging ${microservice} image into ${endProject}"
     openshiftTag(namespace: startProject,
@@ -160,34 +144,34 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
   }
 }
 
-/**
-* [ocpObjectsExist description]
-* @param  String microservice  [description]
-* @param  String project       [description]
-* @return        [description]
-*/
-def boolean ocpObjectsExist(String microservice, String project, String apiURL,
-  String authToken) {
-
-    print "Checking for microservice ${microservice} in project ${project}"
-
-    // TODO: Fix issue where any non-empty/null result string is a true case
-    // Capture results of label queried get all to a string
-    String queryResults = sh (
-      script: """
-      oc get all -l microservice=${microservice} -n ${project}
-      """,
-      returnStdout: true
-    )
-    print "queryResults: ${queryResults}"
-    // If the string is empty/null, the OpenShift objects do not exist
-    if (queryResults == null || queryResults.length() == 0) {
-      print "Microservice ${microservice} not found in project ${project}"
-      return false;
-    }
-    print "Microservice ${microservice} found in project ${project}"
-    return true;
-}
+// /**
+// * [ocpObjectsExist description]
+// * @param  String microservice  [description]
+// * @param  String project       [description]
+// * @return        [description]
+// */
+// def boolean ocpObjectsExist(String microservice, String project, String apiURL,
+//   String authToken) {
+//
+//     print "Checking for microservice ${microservice} in project ${project}"
+//
+//     // TODO: Fix issue where any non-empty/null result string is a true case
+//     // Capture results of label queried get all to a string
+//     String queryResults = sh (
+//       script: """
+//       oc get all -l microservice=${microservice} -n ${project}
+//       """,
+//       returnStdout: true
+//     )
+//     print "queryResults: ${queryResults}"
+//     // If the string is empty/null, the OpenShift objects do not exist
+//     if (queryResults == null || queryResults.length() == 0) {
+//       print "Microservice ${microservice} not found in project ${project}"
+//       return false;
+//     }
+//     print "Microservice ${microservice} found in project ${project}"
+//     return true;
+// }
 
 /**
 * [createOCPObjects description]
@@ -195,8 +179,8 @@ def boolean ocpObjectsExist(String microservice, String project, String apiURL,
 * @return         [description]
 */
 def createOCPObjects(String microservice, String project, String apiURL,
-  String authToken, String createStrategy) {
-    print "Creating OCP objects for ${microservice} in ${project} using strategy ${createStrategy}"
+  String authToken) {
+    print "Creating OCP objects for ${microservice} in ${project} with oc apply."
 
     // Process the microservice's template and create the objects
     sh """
@@ -205,7 +189,7 @@ def createOCPObjects(String microservice, String project, String apiURL,
     MICROSERVICE_NAME=${microservice} \
     GIT_REPO_URL=${gitURL} \
     GIT_REPO_BRANCH=${gitBranch} \
-    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc ${createStrategy} -f - \
+    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - \
     -n ${project}
     """
 
@@ -216,7 +200,7 @@ def createOCPObjects(String microservice, String project, String apiURL,
       MICROSERVICE_NAME=${microservice} \
       GIT_REPO_URL=${gitURL} \
       GIT_REPO_BRANCH=${gitBranch} \
-      GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc ${createStrategy} -f - \
+      GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - \
       -n ${project}
       """
     }
