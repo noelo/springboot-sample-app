@@ -1,11 +1,13 @@
-// Set SKIP_TLS true for Kubernetes API access
-properties([
-  [$class: 'ParametersDefinitionProperty', parameterDefinitions:
-    [
-      [$class: 'StringParameterDefinition', name: 'SKIP_TLS', defaultValue: 'true']
-    ]
-  ]
-])
+// // Set SKIP_TLS true for Kubernetes API access
+// properties([
+//   [$class: 'ParametersDefinitionProperty', parameterDefinitions:
+//     [
+//       [$class: 'StringParameterDefinition', name: 'SKIP_TLS', defaultValue: 'true']
+//     ]
+//   ]
+// ])
+
+SKIP_TLS = true
 
 devClusterAuthToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJqZW5raW5zcHJvamVjdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJqZW5raW5zLXRva2VuLW41MjJoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImplbmtpbnMiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJjODcyMzc1ZS1mZDM0LTExZTYtYTkxZi0yY2MyNjAyZjg3OTQiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6amVua2luc3Byb2plY3Q6amVua2lucyJ9.lUoCu3CPRMtKWWlyMq0uQd4DptOpKa-GcxR0r5n68Io9Nax0iexlYGbNc2UpWBojIuriazHXWTKcFRC7w-SQVBFnAQwfXHXUzZwjlS8LKnwGhYj2SujobSESHGm0R_cC6G_tPqq7GkI9gkFqzCwA4H8_xieqpc4jibdCrCMOwlq7KPJqy-0rfTgoqfWR49gLU0GdkjnJfYeBGepzXZiEeAYO4rGxvbZwT1uGFlEKa4d5Zpt81CLZ6fO-TFmA8aONxOlCDzMvcjOKIqftcEfbkBpahq7uU-1-R3KCbzK5B9N7jHhw5uLjUtFqTuMRwgHrofgs7i-sc5kbx_x7nQRbSw'
 
@@ -54,10 +56,10 @@ stage ('Build and Unit Test in Develop') {
   print "----------------------------------------------------------------------"
 
   node() {
-    sh """
-    oc version
-    """
-    input 'Version good?'
+    // sh """
+    // oc version
+    // """
+    // input 'Version good?'
 
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
