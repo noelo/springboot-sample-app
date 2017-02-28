@@ -117,7 +117,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
   print "                     Promoting to ${endProject}                       "
   print "----------------------------------------------------------------------"
 
-  node() {
+  node('nodejs') {
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
     // login to the project's cluster
