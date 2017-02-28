@@ -14,7 +14,7 @@ stressWWClusterAuthToken = devClusterAuthToken
 prodRRClusterAuthToken = devClusterAuthToken
 prodWWClusterAuthToken = devClusterAuthToken
 
-devClusterAPIURL = 'https://10.1.2.2:8443'
+devClusterAPIURL = 'https://master1-6e16.oslab.opentlc.com:8443'
 stressRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
 stressWWCluster = 'https://master-vip1.paasdev.ams1907.com:8443'
 prodRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
@@ -62,7 +62,7 @@ stage ('Build and Unit Test in Develop') {
 
     print "Logging in..."
     // login to the project's cluster
-    login(apiURL, authToken)
+    login(devClusterAPIURL, authToken)
     print "Logged in."
 
     // Check if the OPC Objects exist in project
