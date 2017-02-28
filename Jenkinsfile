@@ -105,6 +105,10 @@ stage ('Promote to Stress') {
   promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
 }
 
+/*
+* Logs in, creates all OCP objects, tags image into destination project,
+* then verifies the deployment in destination project
+*/
 def promoteImageBetweenProjectsSameCluster(String startProject, String endProject, String clusterAPIURL, String clusterAuthToken) {
   print "----------------------------------------------------------------------"
   print "                     Promoting to ${endProject}                       "
@@ -144,39 +148,9 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
   }
 }
 
-// /**
-// * [ocpObjectsExist description]
-// * @param  String microservice  [description]
-// * @param  String project       [description]
-// * @return        [description]
-// */
-// def boolean ocpObjectsExist(String microservice, String project, String apiURL,
-//   String authToken) {
-//
-//     print "Checking for microservice ${microservice} in project ${project}"
-//
-//     // TODO: Fix issue where any non-empty/null result string is a true case
-//     // Capture results of label queried get all to a string
-//     String queryResults = sh (
-//       script: """
-//       oc get all -l microservice=${microservice} -n ${project}
-//       """,
-//       returnStdout: true
-//     )
-//     print "queryResults: ${queryResults}"
-//     // If the string is empty/null, the OpenShift objects do not exist
-//     if (queryResults == null || queryResults.length() == 0) {
-//       print "Microservice ${microservice} not found in project ${project}"
-//       return false;
-//     }
-//     print "Microservice ${microservice} found in project ${project}"
-//     return true;
-// }
-
 /**
-* [createOCPObjects description]
-* @param  boolean buildConfig   [description]
-* @return         [description]
+* Creates/configures OCP objects in destination project using 'oc apply'
+* Uses main template to create dc,svc,is,route and bc template just for Dev
 */
 def createOCPObjects(String microservice, String project, String apiURL,
   String authToken) {
@@ -209,10 +183,7 @@ def createOCPObjects(String microservice, String project, String apiURL,
 }
 
 /**
-* [login description]
-* @param  String apiURL        [description]
-* @param  String authToken         [description]
-* @return        [description]
+* Logs in to destination cluster
 */
 def login(String apiURL, String authToken) {
   print "Logging in..."
@@ -226,11 +197,7 @@ def login(String apiURL, String authToken) {
 }
 
 /**
-* [gitCheckout description]
-* @param  String url           [description]
-* @param  String branch        [description]
-* @param  String targetDir     [description]
-* @return        [description]
+* Checks out specified branch to retrieve template files
 */
 def gitCheckout(String url, String branch, String targetDir, String credentialsId) {
   print "Git cloning..."
