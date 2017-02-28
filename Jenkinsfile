@@ -65,7 +65,8 @@ stage ('Build and Unit Test in Develop') {
 
     // Check if the OPC Objects exist in project
     if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
-      strategy = "create"
+      //strategy = "create"
+      strategy = "apply"
     } else {
       strategy = "apply"
     }
@@ -125,7 +126,8 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
 
     // Check if the OPC Objects exist in project
     if (!ocpObjectsExist(microservice, endProject, clusterAPIURL, clusterAuthToken)) {
-      strategy = "create"
+      //strategy = "create"
+      strategy = "apply"
     } else {
       strategy = "apply"
     }
