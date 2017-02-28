@@ -46,9 +46,9 @@
                     "type": "Git",
                     "git": {
                         "uri": "${GIT_REPO_URL}",
-                        "ref": "${GIT_REPO_BRANCH}",
-                        "contextDir": "${GIT_CONTEXT_DIR}"
-                    }
+                        "ref": "${GIT_REPO_BRANCH}"
+                    },
+                    "contextDir": "${GIT_CONTEXT_DIR}"
                 },
                 "strategy": {
                     "type": "Source",
@@ -73,7 +73,7 @@
             "status": {
                 "lastVersion": 0
             }
-        }  
+        }
     ],
     "parameters": [
         {
