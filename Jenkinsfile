@@ -66,6 +66,10 @@ stage ('Build and Unit Test in Develop') {
     // login to the project's cluster
     login(devClusterAPIURL, devClusterAuthToken)
 
+    sh """
+    oc import-image --from=fabric8/s2i-java:latest s2i-java --confirm
+    """
+
     createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
 
 
