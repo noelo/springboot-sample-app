@@ -88,7 +88,7 @@ stage ('Build and Unit Test in Develop') {
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
-      waitTime: '50',
+      waitTime: '60',
       waitUnit: 'sec',
       apiURL: devClusterAPIURL,
       authToken: devClusterAuthToken)
@@ -102,11 +102,13 @@ stage ('Promote to Integration') {
   promoteImageBetweenProjectsSameCluster(projectDev, projectInt, devClusterAPIURL, devClusterAuthToken)
 }
 
+input 'Promote to UAT?'
 stage ('Promote to UAT') {
   promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
 }
 
-stage ('Promote to UAT') {
+input 'Promote to Stress?'
+stage ('Promote to Stress') {
   promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
 }
 
@@ -147,7 +149,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
-      waitTime: '50',
+      waitTime: '60',
       waitUnit: 'sec',
       apiURL: clusterAPIURL,
       authToken: clusterAuthToken)
@@ -190,33 +192,34 @@ def boolean ocpObjectsExist(String microservice, String project, String apiURL,
 * @param  boolean buildConfig   [description]
 * @return         [description]
 */
-def createOCPObjects(String microservice, String project, String apiURL, String authToken, String createStrategy) {
-  print "Creating OCP objects for ${microservice} in ${project} using strategy ${createStrategy}"
+def createOCPObjects(String microservice, String project, String apiURL,
+  String authToken, String createStrategy) {
+    print "Creating OCP objects for ${microservice} in ${project} using strategy ${createStrategy}"
 
-  // Process the microservice's template and create the objects
-  sh """
-  # Process the template and create resources
-  oc process -f ${templatePath} \
-  MICROSERVICE_NAME=${microservice} \
-  GIT_REPO_URL=${gitURL} \
-  GIT_REPO_BRANCH=${gitBranch} \
-  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc ${createStrategy} -f - \
-  -n ${project}
-  """
-
-  // If in Develop Project create the BuildConfig as well
-  if (project.equals(projectDev)) {
+    // Process the microservice's template and create the objects
     sh """
-    oc process -f ${buildConfigTemplatePath} \
+    # Process the template and create resources
+    oc process -f ${templatePath} \
     MICROSERVICE_NAME=${microservice} \
     GIT_REPO_URL=${gitURL} \
     GIT_REPO_BRANCH=${gitBranch} \
     GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc ${createStrategy} -f - \
     -n ${project}
     """
-  }
 
-  print "Objects created!"
+    // If in Develop Project create the BuildConfig as well
+    if (project.equals(projectDev)) {
+      sh """
+      oc process -f ${buildConfigTemplatePath} \
+      MICROSERVICE_NAME=${microservice} \
+      GIT_REPO_URL=${gitURL} \
+      GIT_REPO_BRANCH=${gitBranch} \
+      GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc ${createStrategy} -f - \
+      -n ${project}
+      """
+    }
+
+    print "Objects created!"
 }
 
 /**
