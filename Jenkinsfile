@@ -251,7 +251,7 @@ def createOCPObjects(String microservice, String project, String apiURL, String 
   // login(apiURL, authToken)
   // print "Logged in."
 
-  print "Creating OCP objects for ${microservice} in ${project} using strategy ${sourceStrategy}"
+  print "Creating OCP objects for ${microservice} in ${project} using strategy ${createStrategy}"
 
   // Process the microservice's template and create the objects
   sh """
