@@ -269,8 +269,8 @@ def login(String apiURL, String authToken) {
   set +x
   oc login --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
   --token=${authToken} ${apiURL} >/dev/null 2>&1 || echo 'OpenShift login failed'
-  echo "Logged in as $(oc whoami)"
   """
+  //echo "Logged in as $(oc whoami)"
 }
 
 /**
