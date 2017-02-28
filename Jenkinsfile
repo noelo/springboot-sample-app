@@ -103,6 +103,59 @@ stage ('Build and Unit Test in Develop') {
 
 }
 
+stage ('Promote to Integration') {
+  print "----------------------------------------------------------------------"
+  print "                      Promoting to Integration                        "
+  print "----------------------------------------------------------------------"
+
+  node() {
+    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
+
+    print "Logging in..."
+    // login to the project's cluster
+    login(apiURL, authToken)
+    print "Logged in."
+
+    // Check if the OPC Objects exist in project
+    if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
+      // Create the objects
+      print "Creating OCP objects for ${microservice} in ${projectInt}"
+      createOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
+      print "Objects created!"
+    } else {
+      // Replace the objects
+      print "Replacing OCP objects for ${microservice} in ${projectDev}"
+      replaceOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
+      print "OCP objects replaced!"
+    }
+
+    // Tag microservice image into the integration OpenShift project
+    openshiftTag(namespace: projectDev,
+      sourceStream: microservice,
+      sourceTag: 'latest',
+      destinationNamespace: projectInt,
+      destinationStream: microservice,
+      destinationTag: 'latest',
+      apiURL: devClusterAPIURL,
+      authToken: devClusterAuthToken)
+
+    print "Verify Deployment in develop"
+    openshiftVerifyDeployment(
+      depCfg: microservice,
+      namespace: projectDev,
+      replicaCount: '1',
+      verbose: 'false',
+      verifyReplicaCount: 'true',
+      waitTime: '50',
+      waitUnit: 'sec',
+      apiURL: devClusterAPIURL,
+      authToken: devClusterAuthToken)
+    print "Deployment to develop verified!"
+
+  }
+
+}
+
         // oc policy add-role-to-group system:image-puller system:serviceaccounts:hello-integration -n hello-develop
         //stage ('Promote to Integration') {
         //  promoteToInt()
