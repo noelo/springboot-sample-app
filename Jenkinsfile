@@ -84,7 +84,7 @@ stage ('Build and Unit Test in Develop') {
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
-      waitTime: '60',
+      waitTime: '100',
       waitUnit: 'sec',
       apiURL: devClusterAPIURL,
       authToken: devClusterAuthToken)
@@ -142,7 +142,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
-      waitTime: '60',
+      waitTime: '100',
       waitUnit: 'sec',
       apiURL: clusterAPIURL,
       authToken: clusterAuthToken)
