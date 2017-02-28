@@ -62,7 +62,7 @@ stage ('Build and Unit Test in Develop') {
 
     print "Logging in..."
     // login to the project's cluster
-    login(devClusterAPIURL, authToken)
+    login(devClusterAPIURL, devClusterAuthToken)
     print "Logged in."
 
     // Check if the OPC Objects exist in project
