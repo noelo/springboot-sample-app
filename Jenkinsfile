@@ -147,7 +147,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
       replicaCount: '1',
       verbose: 'false',
       verifyReplicaCount: 'true',
-      waitTime: '40',
+      waitTime: '50',
       waitUnit: 'sec',
       apiURL: clusterAPIURL,
       authToken: clusterAuthToken)
