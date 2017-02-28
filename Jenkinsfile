@@ -274,7 +274,7 @@ def replaceOCPObjects(String microservice, String project, String apiURL, String
   MICROSERVICE_NAME=${microservice} \
   GIT_REPO_URL=${gitURL} \
   GIT_REPO_BRANCH=${gitBranch} \
-  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -n ${project}
+  GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
   """
   // If in Develop Project create the BuildConfig as well
   if (project.equals(projectDev)) {
@@ -283,7 +283,7 @@ def replaceOCPObjects(String microservice, String project, String apiURL, String
     MICROSERVICE_NAME=${microservice} \
     GIT_REPO_URL=${gitURL} \
     GIT_REPO_BRANCH=${gitBranch} \
-    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -n ${project}
+    GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
     """
   }
 
