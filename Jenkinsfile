@@ -55,11 +55,11 @@ stage ('Build and Unit Test in Develop') {
   print "                   Build and Unit Test in Develop                     "
   print "----------------------------------------------------------------------"
 
-  node() {
-    // sh """
-    // oc version
-    // """
-    // input 'Version good?'
+  node('nodejs') {
+    sh """
+    oc version
+    """
+    input 'Version good?'
 
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
