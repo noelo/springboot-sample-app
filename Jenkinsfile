@@ -60,29 +60,18 @@ stage ('Build and Unit Test in Develop') {
 
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
-    print "Logging in..."
     // login to the project's cluster
     login(devClusterAPIURL, devClusterAuthToken)
-    print "Logged in."
 
     // Check if the OPC Objects exist in project
     if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
-
       strategy = "create"
-      // Create the objects
-      // print "Creating OCP objects for ${microservice} in ${projectDev}"
-      // createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-      // print "Objects created!"
     } else {
       strategy = "apply"
-      // Replace the objects
-      // print "Replacing OCP objects for ${microservice} in ${projectDev}"
-      // replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-      // print "OCP objects replaced!"
     }
 
     createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken, strategy)
-    print "Objects created!"
+
 
     print "Starting build..."
     openshiftBuild(namespace: projectDev,
@@ -117,42 +106,17 @@ stage ('Promote to Integration') {
   node() {
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
-    print "Logging in..."
     // login to the project's cluster
     login(devClusterAPIURL, devClusterAuthToken)
-    print "Logged in."
-
-    // // Check if the OPC Objects exist in project
-    // if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
-    //   // Create the objects
-    //   print "Creating OCP objects for ${microservice} in ${projectInt}"
-    //   createOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
-    //   print "Objects created!"
-    // } else {
-    //   // Replace the objects
-    //   print "Replacing OCP objects for ${microservice} in ${projectDev}"
-    //   replaceOCPObjects(microservice, projectInt, devClusterAPIURL, devClusterAuthToken)
-    //   print "OCP objects replaced!"
-    // }
 
     // Check if the OPC Objects exist in project
     if (!ocpObjectsExist(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)) {
-
       strategy = "create"
-      // Create the objects
-      // print "Creating OCP objects for ${microservice} in ${projectDev}"
-      // createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-      // print "Objects created!"
     } else {
       strategy = "apply"
-      // Replace the objects
-      // print "Replacing OCP objects for ${microservice} in ${projectDev}"
-      // replaceOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
-      // print "OCP objects replaced!"
     }
 
     createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken, strategy)
-    print "Objects created!"
 
     // Tag microservice image into the integration OpenShift project
     openshiftTag(namespace: projectDev,
@@ -221,8 +185,8 @@ stage ('Promote to Integration') {
 */
 def boolean ocpObjectsExist(String microservice, String project, String apiURL,
   String authToken) {
-    // login to the dev cluster
-    //login(apiURL, authToken)
+
+    print "Checking for microservice ${microservice} in project ${project}"
 
     // TODO: Fix issue where any non-empty/null result string is a true case
     // Capture results of label queried get all to a string
@@ -235,8 +199,10 @@ def boolean ocpObjectsExist(String microservice, String project, String apiURL,
     print "queryResults: ${queryResults}"
     // If the string is empty/null, the OpenShift objects do not exist
     if (queryResults == null || queryResults.length() == 0) {
+      print "Microservice ${microservice} not found in project ${project}"
       return false;
     }
+    print "Microservice ${microservice} found in project ${project}"
     return true;
 }
 
@@ -246,11 +212,6 @@ def boolean ocpObjectsExist(String microservice, String project, String apiURL,
 * @return         [description]
 */
 def createOCPObjects(String microservice, String project, String apiURL, String authToken, String createStrategy) {
-  // print "Logging in..."
-  // // login to the project's cluster
-  // login(apiURL, authToken)
-  // print "Logged in."
-
   print "Creating OCP objects for ${microservice} in ${project} using strategy ${createStrategy}"
 
   // Process the microservice's template and create the objects
@@ -276,160 +237,8 @@ def createOCPObjects(String microservice, String project, String apiURL, String 
     """
   }
 
+  print "Objects created!"
 }
-
-// /**
-// * [replaceOCPObjects description]
-// * @param  String project       [description]
-// * @param  String apiURL        [description]
-// * @param  String authToken     [description]
-// * @return        [description]
-// */
-// def replaceOCPObjects(String microservice, String project, String apiURL, String authToken) {
-//   // print "Logging in..."
-//   // // login to the project's cluster
-//   // login(apiURL, authToken)
-//   // print "Logged in."
-//
-//   // Process the microservice's template
-//   sh """
-//   # Delete old builds
-//   #oc delete builds -l microservice=${microservice} -n ${project}
-//   #oc delete dc/${microservice} -n ${project}
-//   # Process the template
-//   oc process -f ${templatePath} \
-//   MICROSERVICE_NAME=${microservice} \
-//   GIT_REPO_URL=${gitURL} \
-//   GIT_REPO_BRANCH=${gitBranch} \
-//   GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
-//   """
-//   // If in Develop Project create the BuildConfig as well
-//   if (project.equals(projectDev)) {
-//     sh """
-//     oc process -f ${buildConfigTemplatePath} \
-//     MICROSERVICE_NAME=${microservice} \
-//     GIT_REPO_URL=${gitURL} \
-//     GIT_REPO_BRANCH=${gitBranch} \
-//     GIT_CONTEXT_DIR=${gitContextDir} -n ${project} | oc apply -f - -n ${project}
-//     """
-//   }
-//
-// }
-
-                /**
-                * [promoteOCPObjects description]
-                * @param  String microservice  [description]
-                * @param  String srcProject    [description]
-                * @param  String srcAPIURL     [description]
-                * @param  String srcAuthToken  [description]
-                * @param  String destProject   [description]
-                * @param  String destAPIURL    [description]
-                * @param  String destAuthToken [description]
-                * @return        [description]
-                */
-                def promoteOCPObjects(String microservice, String srcProject, String srcAPIURL,
-                  String srcAuthToken, String destProject, String destAPIURL, String destAuthToken) {
-
-                    // login to the source project cluster
-                    login(srcAPIURL, srcAuthToken)
-
-                    // Export the source objects for the microservice as a file
-                    sh """
-                    # Export contents of project for a microservice into a yaml file
-                    oc export dc,is,svc,secret,route -l microservice=${microservice}  \
-                    -n ${srcProject} -o yaml > objects.yaml
-
-                    cat objects.yaml
-                    """
-                    //      -l template=app-template \
-
-
-                    // TODO: Check to see if apply changes route host in OpenShift 3.4
-                    // Attempt to correct the auto generated route
-                    //  File objects = new File('objects.yaml')
-                    //  String corrected = correctRoute(objects.text)
-                    //  objects.text = corrected
-
-                    // Login to the dest project cluster
-                    login(destAPIURL, destAuthToken)
-
-                    // Check if the objects exist in the destination project
-                    if (!ocpObjectsExist(microservice, destProject, destAPIURL,
-                      destAuthToken)) {
-                        // Create the objects in the destination project
-                        sh """
-                        oc create -n ${destProject} -f objects.yaml --save-config
-                        """
-                        //createOCPObjects(microservice, destProject, destAPIURL, destAuthToken)
-                        } else {
-                          // apply the objects in the destination project
-                          sh """
-                          oc apply -n ${destProject} -f objects.yaml
-                          """
-                        }
-
-                        // Delete the objects yaml file
-                        sh """
-                        cat objects.yaml
-                        rm objects.yaml
-                        """
-                      }
-
-                      /**
-                      * [correctRoute description]
-                      * @param  String microservice  [description]
-                      * @param  String srcProject    [description]
-                      * @param  String destProject   [description]
-                      * @param  String exports       [description]
-                      * @return        [description]
-                      */
-                      def String correctRoute(String microservice, String srcProject, String destProject,
-                        String objects) {
-
-                          if (objects.contains("kind: Route")) {
-                            String corrected = objects.replaceAll("host: ${microservice}-${srcProject}",
-                            "host: ${microservice}-${destProject}")
-                            return corrected
-                          }
-                          // There's no route
-                          return objects
-                        }
-
-                        /**
-                        * [copyAllOCPObjects description]
-                        * @param  String srcProject    [description]
-                        * @param  String srcAPIURL     [description]
-                        * @param  String srcAuthToken  [description]
-                        * @param  String destProject   [description]
-                        * @param  String destAPIURL    [description]
-                        * @param  String destAuthToken [description]
-                        * @return        [description]
-                        */
-                        def copyAllOCPObjects(String srcProject, String srcAPIURL, String srcAuthToken,
-                          String destProject, String destAPIURL, String destAuthToken) {
-
-                            // login to the source project cluster
-                            login(srcAPIURL, srcAuthToken)
-
-                            // Export the source objects for the microservice as a file
-                            sh """
-                            # Export contents of project into a yaml file
-                            oc export dc,is,svc,secret,routes --all  \
-                            -n ${srcProject} -o yaml > objects.yaml
-                            """
-
-                            // Login to the dest project cluster
-                            login(destAPIURL, destAuthToken)
-
-                            // Create the objects in the destination project
-                            sh """
-                            oc create -n ${destProject} -f objects.yaml
-                            # Delete the objects file
-                            rm objects.yaml
-                            """
-                          }
-
-
 
 /**
 * [login description]
@@ -438,11 +247,13 @@ def createOCPObjects(String microservice, String project, String apiURL, String 
 * @return        [description]
 */
 def login(String apiURL, String authToken) {
+  print "Logging in..."
+
   sh """
   set +x
   oc login --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
   --token=${authToken} ${apiURL} >/dev/null 2>&1 || echo 'OpenShift login failed'
-  oc whoami
+  echo "Logged in as $(oc whoami)"
   """
 }
 
@@ -454,12 +265,12 @@ def login(String apiURL, String authToken) {
 * @return        [description]
 */
 def gitCheckout(String url, String branch, String targetDir, String credentialsId) {
+  print "Git cloning..."
 
   sh """
   # Ensure the targetDir is deleted before we clone
   rm -rf ${targetDir}
   git clone -b ${branch} ${url} ${targetDir}
-  echo `pwd && ls -l`
   """
 
   //withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${credentialsId}",
