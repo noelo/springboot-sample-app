@@ -118,6 +118,7 @@ oc policy add-role-to-user edit system:serviceaccount:$app_name-develop:cicd -n 
 oc policy add-role-to-user edit system:serviceaccount:$app_name-develop:cicd -n $app_name-uat
 oc policy add-role-to-user edit system:serviceaccount:$app_name-develop:cicd -n $app_name-stress
 oc policy add-role-to-user edit system:serviceaccount:$app_name-develop:cicd -n $app_name-prod
+oc policy add-role-to-user self-provisioner system:serviceaccount:$app_name-develop:cicd
 
 # Give image-pulling role to service account
 # to pull images from development project
