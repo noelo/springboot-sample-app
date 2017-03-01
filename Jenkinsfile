@@ -123,7 +123,7 @@ if (gitBranch == 'develop') {
     sh """
     # Deletes existing feature branch project if it exists
     oc delete project ${featureProject} --ignore-not-found
-    sleep 30
+    sleep 60
 
     # Adds self-provisioner access to jenkins service account
     oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
@@ -166,7 +166,7 @@ if (gitBranch == 'develop') {
     stringArray = routeList.split("\n")
 
     // Loop through list of routes and expose associated service
-    for (int i = 0; i < stringArray.size; i++){
+    for (int i = 0; i < stringArray.size(); i++){
       print stringArray[i]
       routeName = stringArray[i]
       String serviceName = sh (
