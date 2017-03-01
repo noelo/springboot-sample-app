@@ -121,9 +121,10 @@ if (gitBranch == 'develop') {
     login(devClusterAPIURL, "Epnot9pK4lIwWHgKNvS_vYPgGwyg6jffhzZDAKKH_yI")
 
     sh """
+    oc delete project ${featureProject} --ignore-not-found
     oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
 
-    #oc delete project ${featureProject} --ignore-not-found --now
+    sleep 15
     oc new-project ${featureProject}
 
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
