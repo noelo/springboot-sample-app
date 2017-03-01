@@ -170,7 +170,7 @@ if (gitBranch == 'develop') {
     IFS='\n' read -r -a array <<< "$ROUTES"
 
     # loop through routes in array
-    for ELEMENT in "${array[*]}"
+    for ELEMENT in '${array[*]}'
     do
             echo "$ELEMENT"
             SVC_NAME=`oc get route/$ELEMENT --output=jsonpath={.spec.to.name}`
