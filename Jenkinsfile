@@ -110,19 +110,19 @@ if (gitBranch == 'develop') {
   // feature branch pipeline
   print "Kicking of feature pipeline for feature branch ${gitBranch}"
 
-  project = applicationName + "-" + gitBranch
-  print project
+  featureProject = applicationName + "-feature"
+  print featureProject
 
   node() {
 
     login(devClusterAPIURL, "Epnot9pK4lIwWHgKNvS_vYPgGwyg6jffhzZDAKKH_yI")
 
     sh """
-    oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > dev-${applicationName}-export.yaml
-    oc new-project ${applicationName}-${gitBranch}
+    oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
+    oc new-project ${featureProject}
 
-    oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${applicationName}-${gitBranch}
-    oc policy add-role-to-group system:image-puller system:serviceaccounts:${gitBranch} -n ${projectDev}
+    oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
+    oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
     oc create -f export.yaml
     # TODO expose the routes
 
