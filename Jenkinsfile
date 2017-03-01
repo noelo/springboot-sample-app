@@ -127,7 +127,7 @@ if (gitBranch == 'develop') {
     oc create -f export.yaml
     # TODO expose the routes
 
-    // Delete the feature microservice
+    # Delete the feature microservice
     oc delete all -l microservice=${microservice}
     """
 
