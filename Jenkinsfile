@@ -122,10 +122,12 @@ if (gitBranch == 'develop') {
 
     sh """
     oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
+
+    oc delete project ${featureProject} --ignore-not-found --now
     oc new-project ${featureProject}
 
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
-    oc import-image fabric8/s2i-java --confirm
+    oc import-image fabric8/s2i-java -n ${featureProject} --confirm
 
     oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
