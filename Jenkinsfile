@@ -37,12 +37,14 @@ microservice = 'springboot-hello'
 //gitURL = "http://tfs.ups.com:8080/tfs/UpsProd/P08SGIT_EA_CDP/_git/springboot-hello"
 gitURL = "https://github.com/domenicbove/springboot-sample-app"
 gitContextDir = "/"
-gitBranch = "feature-el"
+gitBranch = env.BRANCH_NAME
 gitCommit = env.GIT_COMMIT
 gitCredentialsId = 'nicks-new-pass'
 // gitCredentialsId = 'icdc-jenkins-build'
 
 print "microservice: ${microservice}"
+
+print gitBranch
 
 // Define the name of the microservice's template in OpenShift
 templatePath = "${microservice}/infra/ocp-templates/ups-maven-s2i-routed-template.json"
