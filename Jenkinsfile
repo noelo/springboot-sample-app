@@ -177,7 +177,7 @@ if (gitBranch == 'develop') {
         returnStdout: true
       )
       print serviceName
-      if(serviceName != microservice)
+      if(serviceName != microservice){
         sh """
           oc expose svc/${serviceName} -n ${featureProject}
         """
