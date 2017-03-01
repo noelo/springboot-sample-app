@@ -148,35 +148,35 @@ if (gitBranch == 'develop') {
             oc apply -f export.yaml -n ${featureProject}
             oc delete all -l microservice=${microservice} -n ${featureProject} --cascade=false
           """
-        }
 
-      // Get all routes by name
-      String routeList = sh (
-        script: """
-            oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
-          """,
-        returnStdout: true
-      )
-      print "routes: ${routeList}"
-      stringArray = routeList.split("\n")
+          // Get all routes by name
+          String routeList = sh (
+            script: """
+                oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
+              """,
+            returnStdout: true
+          )
+          print "routes: ${routeList}"
+          stringArray = routeList.split("\n")
 
-      // Loop through list of routes and expose associated service
-      for (int i = 0; i < stringArray.size(); i++){
-        print stringArray[i]
-        routeName = stringArray[i]
-        String serviceName = sh (
-          script: """
-              oc get ${routeName} -n ${projectDev} --output=jsonpath={.spec.to.name}
-            """,
-          returnStdout: true
-        )
-        print serviceName
-        if(serviceName != microservice){
-          sh """
-            oc expose svc/${serviceName} -n ${featureProject}
-          """
+          // Loop through list of routes and expose associated service
+          for (int i = 0; i < stringArray.size(); i++){
+            print stringArray[i]
+            routeName = stringArray[i]
+            String serviceName = sh (
+              script: """
+                  oc get ${routeName} -n ${projectDev} --output=jsonpath={.spec.to.name}
+                """,
+              returnStdout: true
+            )
+            print serviceName
+            if(serviceName != microservice){
+              sh """
+                oc expose svc/${serviceName} -n ${featureProject}
+              """
+            }
+          }
         }
-      }
 
       createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
 
