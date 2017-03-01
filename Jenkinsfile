@@ -108,7 +108,7 @@ if (gitBranch == 'develop') {
 
 } else {
   // feature branch pipeline
-  print "Kicking of feature pipeline for feature branch ${gitBranch}"
+  print "Kicking off feature pipeline for feature branch ${gitBranch}"
 
   //TODO no caps
   featureProject = applicationName + "-" + gitBranch
@@ -164,8 +164,6 @@ if (gitBranch == 'develop') {
     )
     print "routes: ${routeList}"
     stringArray = routeList.split("\n")
-
-    print stringArray
 
     // Loop through list of routes and expose associated service
     for (int i = 0; i < stringArray.size; i++){
