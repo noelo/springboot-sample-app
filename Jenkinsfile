@@ -116,6 +116,8 @@ if (gitBranch == 'develop') {
 
   node() {
 
+    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
+
     login(devClusterAPIURL, "Epnot9pK4lIwWHgKNvS_vYPgGwyg6jffhzZDAKKH_yI")
 
     sh """
