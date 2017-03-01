@@ -115,7 +115,7 @@ if (gitBranch == 'develop') {
 
   node() {
     sh """
-    oc export dc,svc,is -l applicationName=${applicationName} -n dev > dev-${applicationName}-export.yaml
+    oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > dev-${applicationName}-export.yaml
     oc new-project ${applicationName}-${gitBranch}
 
     oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${applicationName}-${gitBranch}
