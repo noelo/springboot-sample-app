@@ -168,7 +168,7 @@ if (gitBranch == 'develop') {
     print stringArray
 
     // Loop through list of routes and expose associated service
-    for (int i=0, i < stringArray.size; i++){
+    for (int i = 0; i < stringArray.size; i++){
       print stringArray[i]
       routeName = stringArray[i]
       String serviceName = sh (
