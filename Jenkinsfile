@@ -113,7 +113,7 @@ if (gitBranch == 'develop') {
   print featureProject
 
   node() {
-    login(devClusterAPIURL, devClusterAuthToken)
+    login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
     sh """
     # Deletes existing feature branch project if it exists
@@ -121,7 +121,7 @@ if (gitBranch == 'develop') {
     sleep 60
 
     # Adds self-provisioner access to jenkins service account
-    # oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
+    oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
 
     # Creates new feature branch project
     oc new-project ${featureProject}
