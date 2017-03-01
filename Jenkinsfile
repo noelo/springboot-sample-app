@@ -56,10 +56,10 @@ stage ('Build and Unit Test in Develop') {
   print "----------------------------------------------------------------------"
 
   node('nodejs') {
-    sh """
-    oc version
-    """
-    input 'Version good?'
+    // sh """
+    // oc version
+    // """
+    // input 'Version good?'
 
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
@@ -69,13 +69,13 @@ stage ('Build and Unit Test in Develop') {
     createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
 
 
-    // print "Starting build..."
-    // openshiftBuild(namespace: projectDev,
-    //   buildConfig: microservice,
-    //   showBuildLogs: 'true',
-    //   apiURL: devClusterAPIURL,
-    //   authToken: devClusterAuthToken)
-    // print "Build started"
+    print "Starting build..."
+    openshiftBuild(namespace: projectDev,
+      buildConfig: microservice,
+      showBuildLogs: 'true',
+      apiURL: devClusterAPIURL,
+      authToken: devClusterAuthToken)
+    print "Build started"
 
     print "Verify Deployment in develop"
     openshiftVerifyDeployment(
@@ -103,7 +103,7 @@ stage ('Promote to UAT') {
   promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
 }
 
-input message: 'Promote to Stress?', submitter: 'fake user'
+input message: 'Promote to Stress?', submitter: 'SYSTEM'
 stage ('Promote to Stress') {
   promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
 }
