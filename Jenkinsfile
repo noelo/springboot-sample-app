@@ -121,25 +121,39 @@ if (gitBranch == 'develop') {
     login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
     sh """
+    # Deletes existing feature branch project if it exists
     oc delete project ${featureProject} --ignore-not-found
-    oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
-
     sleep 30
+
+    # Adds self-provisioner access to jenkins service account
+    oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
+
+    # Creates new feature branch project
     oc new-project ${featureProject}
 
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
-    oc import-image fabric8/s2i-java -n ${featureProject} --confirm
+    # oc import-image fabric8/s2i-java -n ${featureProject} --confirm
 
-    # oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
-    oc policy add-role-to-user edit system:serviceaccount:jenkinsproject:jenkins -n ${featureProject}
+    oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
-
-    oc apply -f export.yaml -n ${featureProject}
-    # TODO expose the routes
-
-    # Delete the feature microservice
-    oc delete all -l microservice=${microservice} -n ${featureProject}
     """
+
+    // Checks if microservices exist in dev project already
+    // If they do, exports them to feature branch project
+    // Otherwise, moves forward
+    String queryResults = sh (
+      script:"""
+        oc get all -l applicationName=${applicationName} -n ${projectDev}
+      """,
+      returnStdout: true
+      )
+      if(queryResults != null || queryResults.lenth() > 0) {
+        sh """
+          oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
+          oc apply -f export.yaml -n ${featureProject}
+          oc delete all -l microservice=${microservice} -n ${featureProject}
+        """
+      }
 
     // Get all routes by name
     String queryResults = sh (
@@ -151,9 +165,12 @@ if (gitBranch == 'develop') {
     print "queryResults: ${queryResults}"
     stringArray = queryResults.split("\n")
 
+    print stringArray
+
     // Loop through list of routes and expose associated service
-    for (routeName in stringArray){
-      print routeName
+    for (int i=0, i < stringArray.size; i++){
+      print stringArray[i]
+      routeName = stringArray[i]
       String serviceName = sh (
         script: """
             oc get ${routeName} --output=jsonpath={.spec.to.name}
