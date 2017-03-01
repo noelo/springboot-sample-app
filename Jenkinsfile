@@ -124,7 +124,7 @@ if (gitBranch == 'develop') {
     oc delete project ${featureProject} --ignore-not-found
     oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
 
-    sleep 15
+    sleep 30
     oc new-project ${featureProject}
 
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
@@ -160,6 +160,7 @@ if (gitBranch == 'develop') {
           """,
         returnStdout: true
       )
+      print serviceName
       sh """
         oc expose ${serviceName} -n ${featureProject}
       """
