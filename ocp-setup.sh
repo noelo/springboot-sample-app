@@ -151,6 +151,9 @@ echo
 oc project $app_name-develop
 oc secrets new-basicauth gitsecret --username=$git_user --password=$git_pass
 
+# TODO add application label to secret
+# oc label secret gitsecret applicationName=cipe
+
 # In order to use this within your Jenkins pipeline,
 # you will need to retrieve the service account's token
 # and place it in your Jenkinsfile for authTokenDev.
