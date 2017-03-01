@@ -162,6 +162,22 @@ if (gitBranch == 'develop') {
     //   """
     // }
 
+    sh """
+    # get routes in dev project by name
+    ROUTES=`oc get routes -l applicationName=${applicationName} --output=name`
+
+    # split list of routes into array
+    IFS='\n' read -r -a array <<< "$ROUTES"
+
+    # loop through routes in array
+    for ELEMENT in "${array[@]}"
+    do
+            echo "$ELEMENT"
+            SVC_NAME=`oc get route/$ELEMENT --output=jsonpath={.spec.to.name}`
+            oc expose $SVC_NAME -n ${featureProject}
+    done
+    """
+
 
     createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
 
