@@ -155,29 +155,6 @@ if (gitBranch == 'develop') {
         """
       }
 
-    createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
-
-    print "Starting build..."
-    openshiftBuild(namespace: featureProject,
-      buildConfig: microservice,
-      showBuildLogs: 'true',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Build started"
-
-    print "Verify Deployment in ${featureProject}"
-    openshiftVerifyDeployment(
-      depCfg: microservice,
-      namespace: featureProject,
-      replicaCount: '1',
-      verbose: 'false',
-      verifyReplicaCount: 'true',
-      waitTime: '60',
-      waitUnit: 'sec',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Deployment in ${featureProject} verified!"
-
 
     // Get all routes by name
     String routeList = sh (
@@ -200,10 +177,22 @@ if (gitBranch == 'develop') {
         returnStdout: true
       )
       print serviceName
-      sh """
-        oc expose svc/${serviceName} -n ${featureProject}
-      """
+      if(serviceName != microservice)
+        sh """
+          oc expose svc/${serviceName} -n ${featureProject}
+        """
+      }
     }
+
+    createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
+
+    print "Starting build..."
+    openshiftBuild(namespace: featureProject,
+      buildConfig: microservice,
+      showBuildLogs: 'true',
+      apiURL: devClusterAPIURL,
+      authToken: devClusterAuthToken)
+    print "Build started"
 
 
   }
