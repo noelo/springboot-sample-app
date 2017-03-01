@@ -124,7 +124,7 @@ if (gitBranch == 'develop') {
 
     oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
-    oc create -f export.yaml
+    oc apply -f export.yaml
     # TODO expose the routes
 
     # Delete the feature microservice
