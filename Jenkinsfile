@@ -132,7 +132,7 @@ if (gitBranch == 'develop') {
     oc delete all -l microservice=${microservice} -n ${featureProject}
     """
 
-    createOCPObjects(microservice, featureProject, clusterAPIURL, clusterAuthToken, true)
+    createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
 
     print "Starting build..."
     openshiftBuild(namespace: featureProject,
