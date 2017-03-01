@@ -177,7 +177,7 @@ if (gitBranch == 'develop') {
       )
       print serviceName
       sh """
-        oc expose ${serviceName} -n ${featureProject}
+        oc expose svc/${serviceName} -n ${featureProject}
       """
     }
 
