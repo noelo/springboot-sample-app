@@ -146,7 +146,7 @@ if (gitBranch == 'develop') {
         sh """
           oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
           oc apply -f export.yaml -n ${featureProject}
-          oc delete all -l microservice=${microservice} -n ${featureProject}
+          oc delete all -l microservice=${microservice} -n ${featureProject} --cascade=false
         """
       }
 
