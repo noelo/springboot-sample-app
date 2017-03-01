@@ -125,7 +125,7 @@ if (gitBranch == 'develop') {
     oc new-project ${featureProject}
 
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
-    oc import-image fabric8/s2i-java
+    oc import-image fabric8/s2i-java --confirm
 
     oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
