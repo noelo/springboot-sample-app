@@ -105,8 +105,6 @@ if (gitBranch == 'develop') {
   }
 
 } else {
-
-  stage('Create & Configure Feature-Branch Project'){
     // feature branch pipeline
     print "Kicking off feature pipeline for feature branch ${gitBranch}"
 
@@ -179,9 +177,7 @@ if (gitBranch == 'develop') {
           """
         }
       }
-    }
 
-    stage('Create Feature-Branch Objects & Build'){
       createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
 
       print "Starting build..."
@@ -192,7 +188,6 @@ if (gitBranch == 'develop') {
         authToken: devClusterAuthToken)
       print "Build started"
 
-    }
   }
 
 }
