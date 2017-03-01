@@ -115,7 +115,7 @@ if (gitBranch == 'develop') {
 
   node() {
 
-    login(devClusterAPIURL, devClusterAuthToken)
+    login(devClusterAPIURL, "Epnot9pK4lIwWHgKNvS_vYPgGwyg6jffhzZDAKKH_yI")
 
     sh """
     oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > dev-${applicationName}-export.yaml
