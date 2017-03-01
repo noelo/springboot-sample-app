@@ -156,7 +156,7 @@ if (gitBranch == 'develop') {
       print routeName
       String serviceName = sh (
         script: """
-            oc get route/${routeName} --output=jsonpath={.spec.to.name}
+            oc get ${routeName} --output=jsonpath={.spec.to.name}
           """,
         returnStdout: true
       )
