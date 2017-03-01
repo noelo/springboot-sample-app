@@ -69,13 +69,13 @@ stage ('Build and Unit Test in Develop') {
     createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
 
 
-    print "Starting build..."
-    openshiftBuild(namespace: projectDev,
-      buildConfig: microservice,
-      showBuildLogs: 'true',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Build started"
+    // print "Starting build..."
+    // openshiftBuild(namespace: projectDev,
+    //   buildConfig: microservice,
+    //   showBuildLogs: 'true',
+    //   apiURL: devClusterAPIURL,
+    //   authToken: devClusterAuthToken)
+    // print "Build started"
 
     print "Verify Deployment in develop"
     openshiftVerifyDeployment(
@@ -98,12 +98,12 @@ stage ('Promote to Integration') {
   promoteImageBetweenProjectsSameCluster(projectDev, projectInt, devClusterAPIURL, devClusterAuthToken)
 }
 
-input 'Promote to UAT?'
+input message: 'Promote to UAT?', submitter: 'SYSTEM'
 stage ('Promote to UAT') {
   promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
 }
 
-input 'Promote to Stress?'
+input message: 'Promote to Stress?', submitter: 'fake user'
 stage ('Promote to Stress') {
   promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
 }
