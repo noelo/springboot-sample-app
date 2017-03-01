@@ -154,10 +154,14 @@ if (gitBranch == 'develop') {
     // Loop through list of routes and expose associated service
     for (routeName in stringArray){
       print routeName
+      String serviceName = sh (
+        script: """
+            oc get route/${routeName} --output=jsonpath={.spec.to.name}
+          """,
+        returnStdout: true
+      )
       sh """
-        echo "${routeName}"
-        SVC_NAME=`oc get route/${routeName} --output=jsonpath={.spec.to.name}`
-        oc expose $SVC_NAME -n ${featureProject}
+        oc expose ${serviceName} -n ${featureProject}
       """
     }
 
