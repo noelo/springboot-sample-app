@@ -156,14 +156,14 @@ if (gitBranch == 'develop') {
       }
 
     // Get all routes by name
-    String queryResults = sh (
+    String routeList = sh (
       script: """
           oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
         """,
       returnStdout: true
     )
-    print "queryResults: ${queryResults}"
-    stringArray = queryResults.split("\n")
+    print "routes: ${routeList}"
+    stringArray = routeList.split("\n")
 
     print stringArray
 
