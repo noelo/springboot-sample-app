@@ -118,7 +118,7 @@ if (gitBranch == 'develop') {
 
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
-    login(devClusterAPIURL, "Epnot9pK4lIwWHgKNvS_vYPgGwyg6jffhzZDAKKH_yI")
+    login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
     sh """
     oc delete project ${featureProject} --ignore-not-found
