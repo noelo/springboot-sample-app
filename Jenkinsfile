@@ -136,8 +136,6 @@ if (gitBranch == 'develop') {
 
 }
 
-}
-
 /*
 * Logs in, creates all OCP objects, tags image into destination project,
 * then verifies the deployment in destination project
