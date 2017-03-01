@@ -29,6 +29,7 @@ projectProd = 'sample-prod'
 
 // Declare microservice name
 microservice = 'springboot-hello'
+applicationName = 'CIPE'
 
 // Collect the git info
 //gitURL = "http://tfs.ups.com:8080/tfs/UpsProd/P08SGIT_EA_CDP/_git/springboot-hello"
@@ -46,63 +47,95 @@ templatePath = "${microservice}/infra/ocp-templates/ups-maven-s2i-routed-templat
 buildConfigTemplatePath = "${microservice}/infra/ocp-templates/build-config-template.json"
 template = "openshift//ups-maven-s2i-routed"
 
-// Build into the develop OpenShift project
-stage ('Build and Unit Test in Develop') {
-  print "----------------------------------------------------------------------"
-  print "                   Build and Unit Test in Develop                     "
-  print "----------------------------------------------------------------------"
+if (gitBranch == 'develop') {
+  // Build into the develop OpenShift project
+  stage ('Build and Unit Test in Develop') {
+    print "----------------------------------------------------------------------"
+    print "                   Build and Unit Test in Develop                     "
+    print "----------------------------------------------------------------------"
 
-  node() {
-    sh """
-    oc version
-    """
-    input 'Version good?'
+    node() {
+      sh """
+      oc version
+      """
+      input 'Version good?'
 
-    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
+      gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
-    // login to the project's cluster
-    login(devClusterAPIURL, devClusterAuthToken)
+      // login to the project's cluster
+      login(devClusterAPIURL, devClusterAuthToken)
 
-    createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken)
+      createOCPObjects(microservice, projectDev, devClusterAPIURL, devClusterAuthToken, true)
 
+      print "Starting build..."
+      openshiftBuild(namespace: projectDev,
+        buildConfig: microservice,
+        showBuildLogs: 'true',
+        apiURL: devClusterAPIURL,
+        authToken: devClusterAuthToken)
+      print "Build started"
 
-    print "Starting build..."
-    openshiftBuild(namespace: projectDev,
-      buildConfig: microservice,
-      showBuildLogs: 'true',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Build started"
+      print "Verify Deployment in develop"
+      openshiftVerifyDeployment(
+        depCfg: microservice,
+        namespace: projectDev,
+        replicaCount: '1',
+        verbose: 'false',
+        verifyReplicaCount: 'true',
+        waitTime: '60',
+        waitUnit: 'sec',
+        apiURL: devClusterAPIURL,
+        authToken: devClusterAuthToken)
+      print "Deployment to develop verified!"
 
-    print "Verify Deployment in develop"
-    openshiftVerifyDeployment(
-      depCfg: microservice,
-      namespace: projectDev,
-      replicaCount: '1',
-      verbose: 'false',
-      verifyReplicaCount: 'true',
-      waitTime: '60',
-      waitUnit: 'sec',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Deployment to develop verified!"
+    }
 
   }
 
+  stage ('Promote to Integration') {
+    promoteImageBetweenProjectsSameCluster(projectDev, projectInt, devClusterAPIURL, devClusterAuthToken)
+  }
+
+  input 'Promote to UAT?'
+  stage ('Promote to UAT') {
+    promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
+  }
+
+  input 'Promote to Stress?'
+  stage ('Promote to Stress') {
+    promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
+  }
+
+} else {
+  // feature branch pipeline
+
+  project = applicationName + "-" + gitBranch
+
+  sh """
+  oc export dc,svc,is -l applicationName=${applicationName} -n dev > dev-${application}-export.yaml
+  oc new-project ${applicationName}-${gitBranch}
+
+  oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${applicationName}-${gitBranch}
+  oc policy add-role-to-group system:image-puller system:serviceaccounts:${gitBranch} -n ${projectDev}
+  oc create -f export.yaml
+  # TODO expose the routes
+
+  // Delete the feature microservice
+  oc delete all -l microservice=${microservice}
+  """
+
+  createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken, true)
+
+  print "Starting build..."
+  openshiftBuild(namespace: project,
+    buildConfig: microservice,
+    showBuildLogs: 'true',
+    apiURL: devClusterAPIURL,
+    authToken: devClusterAuthToken)
+  print "Build started"
+
 }
 
-stage ('Promote to Integration') {
-  promoteImageBetweenProjectsSameCluster(projectDev, projectInt, devClusterAPIURL, devClusterAuthToken)
-}
-
-input 'Promote to UAT?'
-stage ('Promote to UAT') {
-  promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
-}
-
-input 'Promote to Stress?'
-stage ('Promote to Stress') {
-  promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
 }
 
 /*
@@ -120,7 +153,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
     // login to the project's cluster
     login(clusterAPIURL, clusterAuthToken)
 
-    createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken)
+    createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken, false)
 
     print "Tagging ${microservice} image into ${endProject}"
     openshiftTag(namespace: startProject,
@@ -153,7 +186,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
 * Uses main template to create dc,svc,is,route and bc template just for Dev
 */
 def createOCPObjects(String microservice, String project, String apiURL,
-  String authToken) {
+  String authToken, boolean createBuildConfig) {
     print "Creating OCP objects for ${microservice} in ${project} with oc apply."
 
     // Process the microservice's template and create the objects
@@ -168,7 +201,8 @@ def createOCPObjects(String microservice, String project, String apiURL,
     """
 
     // If in Develop Project create the BuildConfig as well
-    if (project.equals(projectDev)) {
+    if(createBuildConfig) {
+    //if (project.equals(projectDev)) {
       sh """
       oc process -f ${buildConfigTemplatePath} \
       MICROSERVICE_NAME=${microservice} \
