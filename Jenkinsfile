@@ -60,8 +60,6 @@ if (gitBranch == 'develop') {
       """
       input 'Version good?'
 
-      gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
       // login to the project's cluster
       login(devClusterAPIURL, devClusterAuthToken)
 
@@ -115,9 +113,6 @@ if (gitBranch == 'develop') {
   print featureProject
 
   node() {
-
-    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
     login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
     sh """
@@ -132,7 +127,7 @@ if (gitBranch == 'develop') {
     oc new-project ${featureProject}
 
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
-    # oc import-image fabric8/s2i-java -n ${featureProject} --confirm
+    oc import-image fabric8/s2i-java -n ${featureProject} --confirm
 
     oc policy add-role-to-user edit system:serviceaccount:jenkinsproject:jenkins -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
@@ -154,7 +149,6 @@ if (gitBranch == 'develop') {
           oc delete all -l microservice=${microservice} -n ${featureProject}
         """
       }
-
 
     // Get all routes by name
     String routeList = sh (
@@ -209,8 +203,6 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
   print "----------------------------------------------------------------------"
 
   node() {
-    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
-
     // login to the project's cluster
     login(clusterAPIURL, clusterAuthToken)
 
@@ -248,6 +240,9 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
 */
 def createOCPObjects(String microservice, String project, String apiURL,
   String authToken, boolean createBuildConfig) {
+
+    gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
+
     print "Creating OCP objects for ${microservice} in ${project} with oc apply."
 
     // Process the microservice's template and create the objects
