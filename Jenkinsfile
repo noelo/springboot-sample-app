@@ -114,6 +114,9 @@ if (gitBranch == 'develop') {
   print project
 
   node() {
+
+    login(devClusterAPIURL, devClusterAuthToken)
+
     sh """
     oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > dev-${applicationName}-export.yaml
     oc new-project ${applicationName}-${gitBranch}
