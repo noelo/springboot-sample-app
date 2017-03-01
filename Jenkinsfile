@@ -113,28 +113,30 @@ if (gitBranch == 'develop') {
   project = applicationName + "-" + gitBranch
   print project
 
-  sh """
-  oc export dc,svc,is -l applicationName=${applicationName} -n dev > dev-${applicationName}-export.yaml
-  oc new-project ${applicationName}-${gitBranch}
+  node() {
+    sh """
+    oc export dc,svc,is -l applicationName=${applicationName} -n dev > dev-${applicationName}-export.yaml
+    oc new-project ${applicationName}-${gitBranch}
 
-  oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${applicationName}-${gitBranch}
-  oc policy add-role-to-group system:image-puller system:serviceaccounts:${gitBranch} -n ${projectDev}
-  oc create -f export.yaml
-  # TODO expose the routes
+    oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${applicationName}-${gitBranch}
+    oc policy add-role-to-group system:image-puller system:serviceaccounts:${gitBranch} -n ${projectDev}
+    oc create -f export.yaml
+    # TODO expose the routes
 
-  // Delete the feature microservice
-  oc delete all -l microservice=${microservice}
-  """
+    // Delete the feature microservice
+    oc delete all -l microservice=${microservice}
+    """
 
-  createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken, true)
+    createOCPObjects(microservice, endProject, clusterAPIURL, clusterAuthToken, true)
 
-  print "Starting build..."
-  openshiftBuild(namespace: project,
-    buildConfig: microservice,
-    showBuildLogs: 'true',
-    apiURL: devClusterAPIURL,
-    authToken: devClusterAuthToken)
-  print "Build started"
+    print "Starting build..."
+    openshiftBuild(namespace: project,
+      buildConfig: microservice,
+      showBuildLogs: 'true',
+      apiURL: devClusterAPIURL,
+      authToken: devClusterAuthToken)
+    print "Build started"
+  }
 
 }
 
