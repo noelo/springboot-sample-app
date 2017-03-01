@@ -108,11 +108,13 @@ if (gitBranch == 'develop') {
 
 } else {
   // feature branch pipeline
+  print "Kicking of feature pipeline for feature branch ${gitBranch}"
 
   project = applicationName + "-" + gitBranch
+  print project
 
   sh """
-  oc export dc,svc,is -l applicationName=${applicationName} -n dev > dev-${application}-export.yaml
+  oc export dc,svc,is -l applicationName=${applicationName} -n dev > dev-${applicationName}-export.yaml
   oc new-project ${applicationName}-${gitBranch}
 
   oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${applicationName}-${gitBranch}
