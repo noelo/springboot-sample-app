@@ -105,90 +105,94 @@ if (gitBranch == 'develop') {
   }
 
 } else {
-  // feature branch pipeline
-  print "Kicking off feature pipeline for feature branch ${gitBranch}"
 
-  //TODO no caps
-  featureProject = applicationName + "-" + gitBranch
-  print featureProject
+  stage('Create & Configure Feature-Branch Project'){
+    // feature branch pipeline
+    print "Kicking off feature pipeline for feature branch ${gitBranch}"
 
-  node() {
-    login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
+    //TODO no caps
+    featureProject = applicationName + "-" + gitBranch
+    print featureProject
 
-    sh """
-    # Deletes existing feature branch project if it exists
-    oc delete project ${featureProject} --ignore-not-found
-    sleep 60
+    node() {
+      login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
-    # Adds self-provisioner access to jenkins service account
-    oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
+      sh """
+      # Deletes existing feature branch project if it exists
+      oc delete project ${featureProject} --ignore-not-found
+      sleep 60
 
-    # Creates new feature branch project
-    oc new-project ${featureProject}
+      # Adds self-provisioner access to jenkins service account
+      oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
 
-    # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
-    oc import-image fabric8/s2i-java -n ${featureProject} --confirm
+      # Creates new feature branch project
+      oc new-project ${featureProject}
 
-    oc policy add-role-to-user edit system:serviceaccount:jenkinsproject:jenkins -n ${featureProject}
-    oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
-    """
+      # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
+      oc import-image fabric8/s2i-java -n ${featureProject} --confirm
 
-    // Checks if microservices exist in dev project already
-    // If they do, exports them to feature branch project
-    // Otherwise, moves forward
-    String queryResults = sh (
-      script:"""
-        oc get all -l applicationName=${applicationName} -n ${projectDev}
-      """,
-      returnStdout: true
-      )
-      if(queryResults != null || queryResults.lenth() > 0) {
-        sh """
-          oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
-          oc apply -f export.yaml -n ${featureProject}
-          oc delete all -l microservice=${microservice} -n ${featureProject} --cascade=false
-        """
-      }
+      oc policy add-role-to-user edit system:serviceaccount:jenkinsproject:jenkins -n ${featureProject}
+      oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
+      """
 
-    // Get all routes by name
-    String routeList = sh (
-      script: """
-          oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
+      // Checks if microservices exist in dev project already
+      // If they do, exports them to feature branch project
+      // Otherwise, moves forward
+      String queryResults = sh (
+        script:"""
+          oc get all -l applicationName=${applicationName} -n ${projectDev}
         """,
-      returnStdout: true
-    )
-    print "routes: ${routeList}"
-    stringArray = routeList.split("\n")
+        returnStdout: true
+        )
+        if(queryResults != null || queryResults.lenth() > 0) {
+          sh """
+            oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
+            oc apply -f export.yaml -n ${featureProject}
+            oc delete all -l microservice=${microservice} -n ${featureProject} --cascade=false
+          """
+        }
 
-    // Loop through list of routes and expose associated service
-    for (int i = 0; i < stringArray.size(); i++){
-      print stringArray[i]
-      routeName = stringArray[i]
-      String serviceName = sh (
+      // Get all routes by name
+      String routeList = sh (
         script: """
-            oc get ${routeName} -n ${projectDev} --output=jsonpath={.spec.to.name}
+            oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
           """,
         returnStdout: true
       )
-      print serviceName
-      if(serviceName != microservice){
-        sh """
-          oc expose svc/${serviceName} -n ${featureProject}
-        """
+      print "routes: ${routeList}"
+      stringArray = routeList.split("\n")
+
+      // Loop through list of routes and expose associated service
+      for (int i = 0; i < stringArray.size(); i++){
+        print stringArray[i]
+        routeName = stringArray[i]
+        String serviceName = sh (
+          script: """
+              oc get ${routeName} -n ${projectDev} --output=jsonpath={.spec.to.name}
+            """,
+          returnStdout: true
+        )
+        print serviceName
+        if(serviceName != microservice){
+          sh """
+            oc expose svc/${serviceName} -n ${featureProject}
+          """
+        }
       }
     }
 
-    createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
+    stage('Create Feature-Branch Objects & Build'){
+      createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
 
-    print "Starting build..."
-    openshiftBuild(namespace: featureProject,
-      buildConfig: microservice,
-      showBuildLogs: 'true',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Build started"
+      print "Starting build..."
+      openshiftBuild(namespace: featureProject,
+        buildConfig: microservice,
+        showBuildLogs: 'true',
+        apiURL: devClusterAPIURL,
+        authToken: devClusterAuthToken)
+      print "Build started"
 
-
+    }
   }
 
 }
