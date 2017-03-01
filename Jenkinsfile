@@ -7,25 +7,25 @@ properties([
   ]
 ])
 
-devClusterAuthToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJzYW1wbGUtZGV2ZWxvcCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJjaWNkLXRva2VuLWU5NXNkIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImNpY2QiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI0OTUxODZkZC1mZGMyLTExZTYtYjNmOS0yY2MyNjAyZjg3OTQiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6c2FtcGxlLWRldmVsb3A6Y2ljZCJ9.SiPnCTSbpG0RcT-iNsoG2w5bPRziK0Rgjv1X7pJErN4O9BVwx5k5aJemyh0HM9imBW4gIDFOfdi2OOlmtj9I0qYlaO3sGlnI1wtP3nPV1a-IE8pU-q1ZjfwyivpGzYYVgXwUo8RI0RNBGF6Bqrw9N6ixiJsK60heFhnQQkxzXQuzOTRJ2ACAyG_oeaS72MqeJrwdYwypSudg-3szW4dtRMrcV1dD_1hwx2DV0McdAxs2ch-Se6ZrYaCvT0oEubPPAe3cnBbZNN3A8gID8Vup9MrBceVf1DWFT1t9ABrQBmKu9xDjS-OM0kbZ4BDIO_yIyuS7Cu86bR4oVcocA6PQAw'
+devClusterAuthToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJqZW5raW5zcHJvamVjdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJqZW5raW5zLXRva2VuLW41MjJoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImplbmtpbnMiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJjODcyMzc1ZS1mZDM0LTExZTYtYTkxZi0yY2MyNjAyZjg3OTQiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6amVua2luc3Byb2plY3Q6amVua2lucyJ9.lUoCu3CPRMtKWWlyMq0uQd4DptOpKa-GcxR0r5n68Io9Nax0iexlYGbNc2UpWBojIuriazHXWTKcFRC7w-SQVBFnAQwfXHXUzZwjlS8LKnwGhYj2SujobSESHGm0R_cC6G_tPqq7GkI9gkFqzCwA4H8_xieqpc4jibdCrCMOwlq7KPJqy-0rfTgoqfWR49gLU0GdkjnJfYeBGepzXZiEeAYO4rGxvbZwT1uGFlEKa4d5Zpt81CLZ6fO-TFmA8aONxOlCDzMvcjOKIqftcEfbkBpahq7uU-1-R3KCbzK5B9N7jHhw5uLjUtFqTuMRwgHrofgs7i-sc5kbx_x7nQRbSw'
 
 stressRRClusterAuthToken = devClusterAuthToken
 stressWWClusterAuthToken = devClusterAuthToken
 prodRRClusterAuthToken = devClusterAuthToken
 prodWWClusterAuthToken = devClusterAuthToken
 
-devClusterAPIURL = 'https://master1-6e16.oslab.opentlc.com:8443'
+devClusterAPIURL = 'https://master1-045a.oslab.opentlc.com:8443'
 stressRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
 stressWWCluster = 'https://master-vip1.paasdev.ams1907.com:8443'
 prodRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
 prodWWClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
 
 // Declare OpenShift project names
-projectDev = 'sample-develop'
-projectInt = 'sample-integration'
-projectUAT = 'sample-uat'
-projectStress = 'sample-stress'
-projectProd = 'sample-prod'
+projectDev = 'hello-develop'
+projectInt = 'hello-integration'
+projectUAT = 'hello-uat'
+projectStress = 'hello-stress'
+projectProd = 'hello-prod'
 
 // Declare microservice name
 microservice = 'springboot-hello'
@@ -130,7 +130,7 @@ if (gitBranch == 'develop') {
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
     oc import-image fabric8/s2i-java -n ${featureProject} --confirm
 
-    oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
+    oc policy add-role-to-user edit system:serviceaccount:${projectDev}:jenkinsproject -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
 
     oc apply -f export.yaml -n ${featureProject}
