@@ -124,11 +124,12 @@ if (gitBranch == 'develop') {
 
     oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
-    oc apply -f export.yaml
+
+    oc apply -f export.yaml -n ${featureProject}
     # TODO expose the routes
 
     # Delete the feature microservice
-    oc delete all -l microservice=${microservice}
+    oc delete all -l microservice=${microservice} -n ${featureProject}
     """
 
     createOCPObjects(microservice, featureProject, clusterAPIURL, clusterAuthToken, true)
