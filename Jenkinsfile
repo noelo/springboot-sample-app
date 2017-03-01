@@ -123,7 +123,7 @@ if (gitBranch == 'develop') {
     sh """
     oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
 
-    oc delete project ${featureProject} --ignore-not-found --now
+    #oc delete project ${featureProject} --ignore-not-found --now
     oc new-project ${featureProject}
 
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
