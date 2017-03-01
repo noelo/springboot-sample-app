@@ -142,7 +142,7 @@ if (gitBranch == 'develop') {
         """,
         returnStdout: true
         )
-        if(queryResults != null || queryResults.lenth() > 0) {
+        if(queryResults.length() > 1) {
           sh """
             oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
             oc apply -f export.yaml -n ${featureProject}
