@@ -124,6 +124,9 @@ if (gitBranch == 'develop') {
     oc export dc,svc,is -l applicationName=${applicationName} -n ${projectDev} > export.yaml
     oc new-project ${featureProject}
 
+    # TODO figure out if need to do this w ups builder image
+    oc import-image fabric8/s2i-java
+
     oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
 

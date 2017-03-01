@@ -17,7 +17,8 @@
                 "generation": 1,
                 "creationTimestamp": null,
                 "labels": {
-                    "microservice": "${MICROSERVICE_NAME}"
+                    "microservice": "${MICROSERVICE_NAME}",
+                    "applicationName": "${APPLICATION_NAME}"
                 },
                 "annotations": {
                     "openshift.io/generated-by": "OpenShiftWebConsole"
@@ -35,7 +36,8 @@
                 "name": "${MICROSERVICE_NAME}",
                 "creationTimestamp": null,
                 "labels": {
-                    "microservice": "${MICROSERVICE_NAME}"
+                    "microservice": "${MICROSERVICE_NAME}",
+                    "applicationName": "${APPLICATION_NAME}"
                 },
                 "annotations": {
                     "openshift.io/generated-by": "OpenShiftWebConsole"
@@ -78,6 +80,7 @@
                         "creationTimestamp": null,
                         "labels": {
                             "microservice": "${MICROSERVICE_NAME}",
+                            "applicationName": "${APPLICATION_NAME}",
                             "deploymentconfig": "${MICROSERVICE_NAME}"
                         }
                     },
@@ -113,7 +116,8 @@
             "metadata": {
                 "name": "${MICROSERVICE_NAME}",
                 "labels": {
-                    "microservice": "${MICROSERVICE_NAME}"
+                    "microservice": "${MICROSERVICE_NAME}",
+                    "applicationName": "${APPLICATION_NAME}"
                 },
                 "annotations": {
                     "description": "Route for application's http service."
@@ -138,7 +142,8 @@
                 "name": "${MICROSERVICE_NAME}",
                 "creationTimestamp": null,
                 "labels": {
-                    "microservice": "${MICROSERVICE_NAME}"
+                    "microservice": "${MICROSERVICE_NAME}",
+                    "applicationName": "${APPLICATION_NAME}"
                 },
                 "annotations": {
                     "openshift.io/generated-by": "OpenShiftWebConsole"
@@ -169,6 +174,11 @@
           "name": "MICROSERVICE_NAME",
           "description": "Microservice Name",
           "value": "java-microservice"
+        },
+        {
+          "name": "APPLICATION_NAME",
+          "description": "Application Name",
+          "value": "cipe"
         },
         {
             "name": "HOSTNAME_HTTP",
