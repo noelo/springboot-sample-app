@@ -53,10 +53,10 @@ stage ('Build and Unit Test in Develop') {
   print "----------------------------------------------------------------------"
 
   node() {
-    sh """
-    oc version
-    """
-    input 'Version good?'
+    // sh """
+    // oc version
+    // """
+    // input 'Version good?'
 
     gitCheckout(gitURL, gitBranch, microservice, gitCredentialsId)
 
@@ -95,12 +95,12 @@ stage ('Promote to Integration') {
   promoteImageBetweenProjectsSameCluster(projectDev, projectInt, devClusterAPIURL, devClusterAuthToken)
 }
 
-input 'Promote to UAT?'
+input message: 'Promote to UAT?', submitter: 'SYSTEM'
 stage ('Promote to UAT') {
   promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
 }
 
-input 'Promote to Stress?'
+input message: 'Promote to Stress?', submitter: 'SYSTEM'
 stage ('Promote to Stress') {
   promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
 }
