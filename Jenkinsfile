@@ -29,7 +29,7 @@ projectProd = 'sample-prod'
 
 // Declare microservice name
 microservice = 'springboot-hello'
-applicationName = 'CIPE'
+applicationName = 'cipe'
 
 // Collect the git info
 //gitURL = "http://tfs.ups.com:8080/tfs/UpsProd/P08SGIT_EA_CDP/_git/springboot-hello"
@@ -110,7 +110,8 @@ if (gitBranch == 'develop') {
   // feature branch pipeline
   print "Kicking of feature pipeline for feature branch ${gitBranch}"
 
-  featureProject = applicationName + "-feature"
+  //TODO no caps
+  featureProject = applicationName + "-" + gitBranch
   print featureProject
 
   node() {
