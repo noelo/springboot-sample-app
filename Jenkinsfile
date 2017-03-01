@@ -140,43 +140,25 @@ if (gitBranch == 'develop') {
     oc delete all -l microservice=${microservice} -n ${featureProject}
     """
 
-    // String queryResults = sh (
-    //   script: """
-    //       oc get routes -l applicationName=${applicationName} --output=name
-    //     """,
-    //   returnStdout: true
-    // )
-    // print "queryResults: ${queryResults}"
-    // stringArray = queryResults.split("\n")
-    //
-    // for (s in stringArray){
-    //   print s
-    //   String svcName = sh (
-    //     script: """
-    //         oc get route/${s} --output=jsonpath={.spec.to.name}
-    //       """,
-    //     returnStdout: true
-    //   )
-    //   sh """
-    //     oc expose svcName -n ${featureProject}
-    //   """
-    // }
+    // Get all routes by name
+    String queryResults = sh (
+      script: """
+          oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
+        """,
+      returnStdout: true
+    )
+    print "queryResults: ${queryResults}"
+    stringArray = queryResults.split("\n")
 
-    sh """
-    # get routes in dev project by name
-    ROUTES=`oc get routes -l applicationName=${applicationName} --output=name`
-
-    # split list of routes into array
-    IFS='\n' read -r -a array <<< '$ROUTES'
-
-    # loop through routes in array
-    for ELEMENT in '${array[*]}'
-    do
-            echo '$ELEMENT'
-            SVC_NAME=`oc get route/$ELEMENT --output=jsonpath={.spec.to.name}`
-            oc expose $SVC_NAME -n ${featureProject}
-    done
-    """
+    // Loop through list of routes and expose associated service
+    for (routeName in stringArray){
+      print routeName
+      sh """
+        echo "${routeName}"
+        SVC_NAME=`oc get route/${routeName} --output=jsonpath={.spec.to.name}`
+        oc expose $SVC_NAME -n ${featureProject}
+      """
+    }
 
 
     createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
