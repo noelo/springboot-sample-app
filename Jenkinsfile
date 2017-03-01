@@ -130,7 +130,8 @@ if (gitBranch == 'develop') {
     # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
     oc import-image fabric8/s2i-java -n ${featureProject} --confirm
 
-    oc policy add-role-to-user edit system:serviceaccount:${projectDev}:jenkinsproject -n ${featureProject}
+    # oc policy add-role-to-user edit system:serviceaccount:${projectDev}:cicd -n ${featureProject}
+    oc policy add-role-to-user edit system:serviceaccount:jenkinsproject:jenkins -n ${featureProject}
     oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
 
     oc apply -f export.yaml -n ${featureProject}
