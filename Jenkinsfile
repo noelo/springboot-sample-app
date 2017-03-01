@@ -140,6 +140,29 @@ if (gitBranch == 'develop') {
     oc delete all -l microservice=${microservice} -n ${featureProject}
     """
 
+    // String queryResults = sh (
+    //   script: """
+    //       oc get routes -l applicationName=${applicationName} --output=name
+    //     """,
+    //   returnStdout: true
+    // )
+    // print "queryResults: ${queryResults}"
+    // stringArray = queryResults.split("\n")
+    //
+    // for (s in stringArray){
+    //   print s
+    //   String svcName = sh (
+    //     script: """
+    //         oc get route/${s} --output=jsonpath={.spec.to.name}
+    //       """,
+    //     returnStdout: true
+    //   )
+    //   sh """
+    //     oc expose svcName -n ${featureProject}
+    //   """
+    // }
+
+
     createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
 
     print "Starting build..."
