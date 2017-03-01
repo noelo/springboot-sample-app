@@ -108,8 +108,8 @@ if (gitBranch == 'develop') {
     // feature branch pipeline
     print "Kicking off feature pipeline for feature branch ${gitBranch}"
 
-    //TODO no caps
     featureProject = applicationName + "-" + gitBranch
+    featureProject.toLowerCase()
     print featureProject
 
     node() {
@@ -161,7 +161,6 @@ if (gitBranch == 'develop') {
 
           // Loop through list of routes and expose associated service
           for (int i = 0; i < stringArray.size(); i++){
-            print stringArray[i]
             routeName = stringArray[i]
             String serviceName = sh (
               script: """
@@ -169,7 +168,7 @@ if (gitBranch == 'develop') {
                 """,
               returnStdout: true
             )
-            print serviceName
+            print "exposing ${serviceName}"
             if(serviceName != microservice){
               sh """
                 oc expose svc/${serviceName} -n ${featureProject}
