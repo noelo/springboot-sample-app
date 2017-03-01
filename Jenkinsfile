@@ -123,7 +123,6 @@ if (gitBranch == 'develop') {
     sh """
     # Deletes existing feature branch project if it exists
     oc delete project ${featureProject} --ignore-not-found
-    sleep 60
 
     # Adds self-provisioner access to jenkins service account
     oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
@@ -155,6 +154,30 @@ if (gitBranch == 'develop') {
         """
       }
 
+    createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
+
+    print "Starting build..."
+    openshiftBuild(namespace: featureProject,
+      buildConfig: microservice,
+      showBuildLogs: 'true',
+      apiURL: devClusterAPIURL,
+      authToken: devClusterAuthToken)
+    print "Build started"
+
+    print "Verify Deployment in ${featureProject}"
+    openshiftVerifyDeployment(
+      depCfg: microservice,
+      namespace: featureProject,
+      replicaCount: '1',
+      verbose: 'false',
+      verifyReplicaCount: 'true',
+      waitTime: '60',
+      waitUnit: 'sec',
+      apiURL: devClusterAPIURL,
+      authToken: devClusterAuthToken)
+    print "Deployment in ${featureProject} verified!"
+
+
     // Get all routes by name
     String routeList = sh (
       script: """
@@ -182,15 +205,6 @@ if (gitBranch == 'develop') {
     }
 
 
-    createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
-
-    print "Starting build..."
-    openshiftBuild(namespace: featureProject,
-      buildConfig: microservice,
-      showBuildLogs: 'true',
-      apiURL: devClusterAPIURL,
-      authToken: devClusterAuthToken)
-    print "Build started"
   }
 
 }
