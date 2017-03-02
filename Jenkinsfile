@@ -113,7 +113,7 @@ if (gitBranch == 'develop') {
     print gitCommit
 
     node() {
-      login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
+      login(devClusterAPIURL, "qV4aVc-qz2_HPVJpWVjp4TldzTdRm_Kdd3nhy4uM5Mc")
 
       sh """
       # Deletes existing feature branch project if it exists
