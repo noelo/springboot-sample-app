@@ -110,6 +110,8 @@ if (gitBranch == 'develop') {
     featureProject.toLowerCase()
     print featureProject
 
+    print gitCommit
+
     node() {
       login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
