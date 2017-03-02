@@ -55,10 +55,6 @@ if (gitBranch == 'develop') {
     print "----------------------------------------------------------------------"
 
     node() {
-      sh """
-      oc version
-      """
-      input 'Version good?'
 
       // login to the project's cluster
       login(devClusterAPIURL, devClusterAuthToken)
@@ -95,11 +91,13 @@ if (gitBranch == 'develop') {
   }
 
   input 'Promote to UAT?'
+  // input message: "Promote to UAT?", submitter: "Jenkins Admin"
   stage ('Promote to UAT') {
     promoteImageBetweenProjectsSameCluster(projectInt, projectUAT, devClusterAPIURL, devClusterAuthToken)
   }
 
   input 'Promote to Stress?'
+  // input message: "Promote to Stress?", submitter: "Jenkins Admin"
   stage ('Promote to Stress') {
     promoteImageBetweenProjectsSameCluster(projectUAT, projectStress, devClusterAPIURL, devClusterAuthToken)
   }
@@ -189,7 +187,6 @@ if (gitBranch == 'develop') {
 
   }
 
-}
 
 /*
 * Logs in, creates all OCP objects, tags image into destination project,
@@ -227,7 +224,7 @@ def promoteImageBetweenProjectsSameCluster(String startProject, String endProjec
       waitUnit: 'sec',
       apiURL: clusterAPIURL,
       authToken: clusterAuthToken)
-    print "Deployment to develop verified!"
+    print "Deployment to ${endProject} verified!"
 
   }
 }
