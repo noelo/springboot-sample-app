@@ -188,7 +188,7 @@ if (gitBranch == 'develop') {
       print "Build started"
 
   }
-
+}
 
 /*
 * Logs in, creates all OCP objects, tags image into destination project,
