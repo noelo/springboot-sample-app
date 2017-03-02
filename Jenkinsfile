@@ -255,7 +255,7 @@ def createOCPObjects(String microservice, String project, String apiURL,
 
     // If in Develop Project create the BuildConfig as well
     if(createBuildConfig) {
-    //if (project.equals(projectDev)) {
+    //if (project.equals(projectDev))
       sh """
       oc process -f ${buildConfigTemplatePath} \
       MICROSERVICE_NAME=${microservice} \
