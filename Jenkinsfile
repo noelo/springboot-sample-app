@@ -193,6 +193,7 @@ if (gitBranch == 'develop') {
         sh """
           sleep 10
           echo "slept"
+          oc delete project ${featureProject}
         """
       }
     }
