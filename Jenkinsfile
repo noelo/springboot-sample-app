@@ -112,7 +112,7 @@ if (gitBranch == 'develop') {
     print featureProject
 
     node() {
-      login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
+      login(devClusterAPIURL, "aMCQ2UWROf5AhdIWKDy4_ZE_dksnkOQDnwiZ4J4Df9g")
 
       try {
         sh """
