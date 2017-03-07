@@ -7,14 +7,15 @@ properties([
   ]
 ])
 
-devClusterAuthToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJqZW5raW5zcHJvamVjdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJqZW5raW5zLXRva2VuLW41MjJoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImplbmtpbnMiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJjODcyMzc1ZS1mZDM0LTExZTYtYTkxZi0yY2MyNjAyZjg3OTQiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6amVua2luc3Byb2plY3Q6amVua2lucyJ9.lUoCu3CPRMtKWWlyMq0uQd4DptOpKa-GcxR0r5n68Io9Nax0iexlYGbNc2UpWBojIuriazHXWTKcFRC7w-SQVBFnAQwfXHXUzZwjlS8LKnwGhYj2SujobSESHGm0R_cC6G_tPqq7GkI9gkFqzCwA4H8_xieqpc4jibdCrCMOwlq7KPJqy-0rfTgoqfWR49gLU0GdkjnJfYeBGepzXZiEeAYO4rGxvbZwT1uGFlEKa4d5Zpt81CLZ6fO-TFmA8aONxOlCDzMvcjOKIqftcEfbkBpahq7uU-1-R3KCbzK5B9N7jHhw5uLjUtFqTuMRwgHrofgs7i-sc5kbx_x7nQRbSw'
+devClusterAuthToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImplbmtpbnMtdG9rZW4tOHk3OWsiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiamVua2lucyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImM4NDE3Zjg0LTAyOGEtMTFlNy05NmFmLTJjYzI2MDJmODc5NCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmplbmtpbnMifQ.UBn2-N8fkBLZekTXwhAWbcRu-YfqbJbdNmb4I9Q3YEZH_hqkXVVIl3RpT14CJ_kpSeomGKXmfcOr77Y58Q63HuHwxYQffciWM0VfaskBxGy0i1vI4VIqHij-lTCMvntghk6L4c5I7RKCIWOfmroCIYPpCI0NaZjifpO4E-V_hW5oWNOF4sMN_hwfTn3A1smkZaHQ4ax7KIUCdqG0serpDMLiuX0basBKGQBFF7fde0NrbT3WH8D0G2saayeZEehOq31IDDnN_1Q9WBTI4429x2bDBiRUJWLJ-2H7lVBDSeyANYmZ4CPL44Y_2sfOmq8G1btQedKYjxVMuWtk0c8s9w'
 
 stressRRClusterAuthToken = devClusterAuthToken
 stressWWClusterAuthToken = devClusterAuthToken
 prodRRClusterAuthToken = devClusterAuthToken
 prodWWClusterAuthToken = devClusterAuthToken
 
-devClusterAPIURL = 'https://master1-045a.oslab.opentlc.com:8443'
+devClusterAPIURL = 'https://master1-be43.oslab.opentlc.com:8443'
+
 stressRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
 stressWWCluster = 'https://master-vip1.paasdev.ams1907.com:8443'
 prodRRClusterAPIURL = 'https://master-vip1.paasdev.ams1907.com:8443'
@@ -110,81 +111,91 @@ if (gitBranch == 'develop') {
     featureProject.toLowerCase()
     print featureProject
 
-    node() {
-      login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
-      sh """
-      # Deletes existing feature branch project if it exists
-      oc delete project ${featureProject} --ignore-not-found
-      sleep 60
+    try {
+      node() {
+        login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
-      # Adds self-provisioner access to jenkins service account
-      oc policy add-role-to-user self-provisioner system:serviceaccount:jenkinsproject:jenkins
+        sh """
+        # Deletes existing feature branch project if it exists
+        oc delete project ${featureProject} --ignore-not-found
+        sleep 60
 
-      # Creates new feature branch project
-      oc new-project ${featureProject}
+        # Adds self-provisioner access to jenkins service account
+        oc policy add-role-to-user self-provisioner system:serviceaccount:default:jenkins
 
-      # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
-      oc import-image fabric8/s2i-java -n ${featureProject} --confirm
+        # Creates new feature branch project
+        oc new-project ${featureProject}
 
-      oc policy add-role-to-user edit system:serviceaccount:jenkinsproject:jenkins -n ${featureProject}
-      oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
-      """
+        # TODO delete for ups, also make sure build config uses openshift/maven-s2i...
+        oc import-image fabric8/s2i-java -n ${featureProject} --confirm
 
-      // Checks if microservices exist in dev project already
-      // If they do, exports them to feature branch project
-      // Otherwise, moves forward
-      String queryResults = sh (
-        script:"""
-          oc get all -l applicationName=${applicationName} -n ${projectDev}
-        """,
-        returnStdout: true
-        )
-        if(queryResults.length() > 1) {
-          sh """
-            oc export dc,svc,is,secret -l applicationName=${applicationName} -n ${projectDev} > export.yaml
-            oc apply -f export.yaml -n ${featureProject}
-            oc delete all -l microservice=${microservice} -n ${featureProject} --cascade=false
-          """
+        oc policy add-role-to-user edit system:serviceaccount:default:jenkins -n ${featureProject}
+        oc policy add-role-to-group system:image-puller system:serviceaccounts:${featureProject} -n ${projectDev}
+        """
 
-          // Get all routes by name
-          String routeList = sh (
-            script: """
-                oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
-              """,
-            returnStdout: true
+        // Checks if microservices exist in dev project already
+        // If they do, exports them to feature branch project
+        // Otherwise, moves forward
+        String queryResults = sh (
+          script:"""
+            oc get all -l applicationName=${applicationName} -n ${projectDev}
+          """,
+          returnStdout: true
           )
-          print "routes: ${routeList}"
-          stringArray = routeList.split("\n")
+          if(queryResults.length() > 1) {
+            sh """
+              oc export dc,svc,is,secret -l applicationName=${applicationName} -n ${projectDev} > export.yaml
+              oc apply -f export.yaml -n ${featureProject}
+              oc delete all -l microservice=${microservice} -n ${featureProject} --cascade=false
+            """
 
-          // Loop through list of routes and expose associated service
-          for (int i = 0; i < stringArray.size(); i++){
-            routeName = stringArray[i]
-            String serviceName = sh (
+            // Get all routes by name
+            String routeList = sh (
               script: """
-                  oc get ${routeName} -n ${projectDev} --output=jsonpath={.spec.to.name}
+                  oc get routes -l applicationName=${applicationName} -n ${projectDev} --output=name
                 """,
               returnStdout: true
             )
-            print "exposing ${serviceName}"
-            if(serviceName != microservice){
-              sh """
-                oc expose svc/${serviceName} -n ${featureProject}
-              """
+            print "routes: ${routeList}"
+            stringArray = routeList.split("\n")
+
+            // Loop through list of routes and expose associated service
+            for (int i = 0; i < stringArray.size(); i++){
+              routeName = stringArray[i]
+              String serviceName = sh (
+                script: """
+                    oc get ${routeName} -n ${projectDev} --output=jsonpath={.spec.to.name}
+                  """,
+                returnStdout: true
+              )
+              print "exposing ${serviceName}"
+              if(serviceName != microservice){
+                sh """
+                  oc expose svc/${serviceName} -n ${featureProject}
+                """
+              }
             }
           }
-        }
 
-      createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
+        createOCPObjects(microservice, featureProject, devClusterAPIURL, devClusterAuthToken, true)
 
-      print "Starting build..."
-      openshiftBuild(namespace: featureProject,
-        buildConfig: microservice,
-        showBuildLogs: 'true',
-        apiURL: devClusterAPIURL,
-        authToken: devClusterAuthToken)
-      print "Build started"
+        print "Starting build..."
+        openshiftBuild(namespace: featureProject,
+          buildConfig: microservice,
+          showBuildLogs: 'true',
+          apiURL: devClusterAPIURL,
+          authToken: devClusterAuthToken)
+        print "Build started"
 
+    }
+  } finally {
+    print "got to finally block"
+
+    sh """
+      sleep 10
+      echo "slept"
+    """
   }
 
 
