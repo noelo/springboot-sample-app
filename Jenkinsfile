@@ -111,11 +111,10 @@ if (gitBranch == 'develop') {
     featureProject.toLowerCase()
     print featureProject
 
+    node() {
+      login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
 
-    try {
-      node() {
-        login(devClusterAPIURL, "olulotvKMI4p-d17znVL8jkxQjFmP7SQOur0vTLsRQ8")
-
+      try {
         sh """
         # Deletes existing feature branch project if it exists
         oc delete project ${featureProject} --ignore-not-found
@@ -188,16 +187,15 @@ if (gitBranch == 'develop') {
           authToken: devClusterAuthToken)
         print "Build started"
 
+      } finally {
+        print "got to finally block"
+
+        sh """
+          sleep 10
+          echo "slept"
+        """
+      }
     }
-  } finally {
-    print "got to finally block"
-
-    sh """
-      sleep 10
-      echo "slept"
-    """
-  }
-
 }
 
 /*
